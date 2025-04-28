@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASH</title>
+    <link rel="icon" type="image/x-icon" href="../public/imges/logo.png">
+</head>
+<body>
+  <style>body{font-family:"Playfair Display",serif;font-optical-sizing:auto;font-style:normal;background-color:#f0f2f5;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}form{background:#fff;padding:30px;border-radius:10px;box-shadow:0 4px 8px rgb(0 0 0 / .1);text-align:center;width:300px}input[type="file"],input[type="text"],textarea{margin-bottom:15px;padding:10px;border:1px solid #ccc;border-radius:5px;width:100%}button{background-color:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;width:100%;font-size:16px}button:hover{background-color:#0056b3}.more-details{display:block;margin-top:20px;color:#007bff;text-decoration:none}.more-details:hover{text-decoration:underline}</style>
+    <% if(locals.account){ %>
+    <form action="/upload_new_post" method="POST" enctype="multipart/form-data">
+        <div class="content">
+          <div class="parent">
+            <input type="file" name="image" multiple accept=".jpg, .jpeg, .png, .gif" />
+            <div class="div2">
+              <div class="flex-start">
+                <p><strong></strong> <input type="hidden" name="companyName" value='<%=account.name%>' /></p>
+                <input type="hidden" name="accountID" value='<%=account.id%>' />
+                <input type="hidden" name="type" value='<%=account.account_type%>'/>
+
+                <p><strong>POST TITLE:</strong> <input type="text" name="title" /></p>
+              </div>
+            </div>
+            <div class="div3">
+              <div class="flex">
+                <p>LOCATION: <input type="text" name="location" /></p>
+              </div>
+            </div>
+            <div class="div4">
+              <div class="flex">
+                <p><input type="hidden" name='<%=account.phone_number%>' /></p>
+              </div>
+            </div>
+            <div class="div5">
+              <div class="flex-start">
+              </div>
+            </div>
+            <div class="div6">
+              <p style="padding-top:20px; margin-bottom: -10px;">Details about the post... <textarea name="details"></textarea></p>
+            </div>
+          </div>
+          <div class="div7">
+          </div>
+        </div>
+        <input type="hidden" name="list_type" , value='<%=list_type%>'>
+        <button type="submit">Upload</button>
+      </form>
+      <% } %>
+</body>
+
+</html>

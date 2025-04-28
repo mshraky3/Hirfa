@@ -1,0 +1,74 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+   
+}
+
+/* Navbar Container */
+nav {
+    color: white; /* Light text color */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    
+}
+
+/* Nav List */
+.nav-list {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    width: 100%;
+}
+
+/* Logo Container */
+.logo-cont {
+    display: flex;
+    align-items: center;
+}
+
+/* Logo */
+.logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    
+}
+
+.logo .dash-text {
+    text-decoration: none;
+    color: #fafafa;
+}
+
+/* DASH Text */
+.dash-text {
+    margin-left: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Links Container */
+.links-cont {
+    display: flex;
+    justify-content: flex-end; /* Align links to the right */
+}
+
+.links-cot {
+    display: flex;
+    align-items: center;
+}
+
+/* Individual Links */
+.nav-link {
+    margin: 0 0.5rem; /* Spacing between links */
+    font-size: 1rem;
+    text-decoration: none;
+    color: white; /* Light text color */
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: #ecf0f1; /* Slightly lighter hover color */
+    }
+}

@@ -1,0 +1,51 @@
+html{
+    direction: ltr;
+}
+
+
+.header{
+    background-image: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDJ8fGdyYXkgbmF2fGVufDB8fHx8MTY5MjQ3NTY1Ng&ixlib=rb-4.0.3&q=80&w=1080');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+
+}
+
+
+.header-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    margin-top: 10%;
+    padding: 20px;
+    font-size: xx-large;
+}
+
+
+.header-buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 20%;
+}
+
+.header-buttons button{
+    background-color: #141414; /* Green */
+    border: none;
+    color: white;
+    padding: 5% 10%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 2% 1%;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.header-buttons button:hover{
+    background-color: #505351; /* Darker green on hover */
+}

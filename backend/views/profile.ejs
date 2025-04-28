@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DASH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="../public/imges/logo.png">
+  <link rel="stylesheet" href="../public/style/profile.css">
+</head>
+
+<body id="body">
+  <section id="img">
+    <%-include('nav');%>
+  </section>
+  <hr class="hr">
+  <section>
+    <style>.type-contaner{aspect-ratio:16/9}.btn-info{background-color:#b6bea5;border-color:#a2aa93;color:#fdfdfd}.btn-info:hover{background-color:#a2aa93;border-color:#0f0f0e;color:#fdfdfd}.card-title{color:#0f0f0e}.card-body a{background-color:#b6bea5;border-color:#a2aa93;color:#0f0f0e}.card-body a:hover{background-color:#a2aa93;border-color:#a2aa93;color:#fdfdfd}.card-text{color:#0f0f0e}</style>
+    
+    <div class="back" id="cards">
+      <div class="container">
+        <div class="row">
+          <div class="col col col-lg-4">
+            <div class="center-contaner">
+              <div class="type-contaner">
+                <div class="type-cards">
+                  <div class="main-link"> <a href="/list/company">مكاتب هندسية</a></div>
+                  <div class="arrow2"> <form action="/list/company" method="get"> <button class="btn btn-info more" name="upload_type" value="company">المزيد</button> </form> </div>
+                  <div class="link"> <form action="/uploaded" method="post"> <style> </style> <button name="upload_type" value="company">المشاريع المعروضة</button> </form></div>
+                  <div class="arrow"> <form action="/uploaded" method="post"> <button class="btn btn-info more" name="upload_type" value="company">المزيد</button> </form> </div>
+                  <% if(locals.type ==='user'){ %>
+                  <div class="link2"><form action="/upload_post" method="post"><button name="upload_type" value="company">اعرض مشروعك</button></form></div>
+                  <div class="arrow2"> <form action="/upload_post" method="post"> <button class="btn btn-info more" name="upload_type" value="company">المزيد</button> </form> </div>
+                  <% }else if (locals.type){ %>
+                    <div class="link2"><form action="/upload_post" method="post"><button name="upload_type" value="company">أضف مشروعك الي قائمة اعملاك</button></form></div>
+                    <div class="arrow2"> <form action="/upload_post" method="post"> <button class="btn btn-info more" name="upload_type" value="company">المزيد</button> </form> </div>
+                  <% }else{ %>
+                  <div class="link2"><form action="/login" method="get"><button name="upload_type" value="company">اعرض مشروعك</button></form></div>
+                  <div class="arrow2"> <form action="/login" method="get"> <button class="btn btn-info more" name="upload_type" value="company">المزيد</button> </form> </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col col col-lg-4">
+            <div class="center-contaner">
+              <div class="type-contaner">
+                <div class="type-cards">
+                  <div class="main-link"> <a href="/list/contractor">مقاولات</a></div>
+                  <div class="arrow"> <form action="/list/contractor" method="get"> <button class="btn btn-info more" name="upload_type" value="contractor">المزيد</button> </form> </div>
+
+                  <div class="link"> <form action="/uploaded" method="post"> <style> button { background: none; border: none; outline: none; box-shadow: none; } </style> <button name="upload_type" value="contractor">المشاريع المعروضة</button> </form></div>
+                  <div class="arrow"> <form action="/uploaded" method="post"> <button class="btn btn-info more" name="upload_type" value="contractor">المزيد</button> </form> </div>
+                  <% if(locals.type==="user"){ %>
+                  <div class="link2"><form action="/upload_post" method="post"><button name="upload_type" value="contractor">اعرض مشروعك</button></form></div>
+                  <div class="arrow2"> <form action="/upload_post" method="post"> <button class="btn btn-info more"  name="upload_type" value="contractor">المزيد</button> </form> </div>
+                  <% }else if (locals.type){ %>
+                    <div class="link2"><form action="/upload_post" method="post"><button name="upload_type" value="contractor">أضف مشروعك الي قائمة اعملاك</button></form></div>
+                    <div class="arrow2"> <form action="/upload_post" method="post"> <button class="btn btn-info more" name="upload_type" value="contractor">المزيد</button> </form> </div>
+                  <% }else{ %>
+                  <div class="link2"><form action="/login" method="get"><button name="upload_type" value="contractor">اعرض مشروعك</button></form></div>
+                  <div class="arrow2"> <form action="/login" method="get"> <button class="btn btn-info more more" name="upload_type" value="contractor">المزيد</button> </form> </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col col col-lg-4">
+            <div class="center-contaner">
+              <div class="type-contaner">
+                <div class="type-cards">
+                  <div class="main-link"> <a href="/list/freelancer">افراد</a></div>
+                  <div class="arrow2"> <form action="/list/freelancer" method="get"> <button class="btn btn-info more" name="upload_type" value="freelancer">المزيد</button> </form> </div>
+                  <div class="link"> <form action="/uploaded" method="post"> <style> button { background: none; border: none; outline: none; box-shadow: none; } </style> <button name="upload_type" value="freelancer">المشاريع المعروضة</button> </form></div>
+                  <div class="arrow"> <form action="/uploaded" method="post"> <button class="btn btn-info more" name="upload_type" value="freelancer">المزيد</button> </form> </div>
+                  <% if(locals.type==="user"){ %>
+                  <div class="link2"><form action="/upload_post" method="post"><button name="upload_type" value="freelancer">اعرض مشروعك</button></form></div>
+                  <div class="arrow2"> <form action="/upload_post" method="post"> <button class="btn btn-info more" name="upload_type" value="freelancer">المزيد</button> </form> </div>
+                  <% }else if (locals.type){ %>
+                    <div class="link2"><form action="/upload_post" method="post"><button name="upload_type" value="freelancer">أضف مشروعك الي قائمة اعملاك</button></form></div>
+                    <div class="arrow2"> <form action="/upload_post" method="post"> <button class="btn btn-info more" name="upload_type" value="freelancer">المزيد</button> </form> </div>
+                  <% }else{ %>
+                  <div class="link2"><form action="/login" method="get"><button name="upload_type" value="freelancer">اعرض مشروعك</button></form></div>
+                  <div class="arrow2"> <form action="/login" method="get"> <button class="btn btn-info more" name="upload_type" value="freelancer">المزيد</button> </form> </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="some-posts">
+    <div class="contrast">
+
+    
+    <div class="some-posts-contaner">
+      <div class="some-posts-text">
+        المشاريع المعروضة-مكاتب هندسية
+      </div>
+      <div class="some-posts-btn">
+        <form action="/uploaded" method="post"> <button class="btn btn-info some-posts-btn more" name="upload_type" value="company">المزيد</button> </form> </form>
+      </div>
+    </div>
+    <div class="center-posts">
+        <div class="row">
+        <%if(locals.companies){ %>
+        <% companies.forEach(company => { %>
+          <div class="col">
+            <div class="some-posts-posts">
+              <div class="card" style="width: 16rem;">
+                <div class="img-control">
+                </div>
+
+                <img class="card-img-top" src="data:image/jpeg;base64,<%= company.images[0] %>" alt="<%= company.name %>" alt="Card image cap" width="250px" height="143px" overflow="hidden">
+                <div class="card-body" >
+                  <h5 class="card-title"><%=company.name %></h5>
+                  <p class="card-text"><%=company.title %></p>
+                  <a href="/post/company/<%=company.id%>" class="btn btn-primary">المزيد من التفاصيل</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }) %>  
+          <% for(let x = 0; x<Cnum;x++){ %>
+              <div class="col none" style="opacity: 50%;" style="background-color: rgb(161, 158, 159);">
+                <div class="some-posts-posts">
+                  <div class="card" style="width: 16rem;" >
+                    <img class="card-img-top" style="background-color: rgb(161, 158, 159);" width="250px" height="143px" overflow="hidden">
+                    <div class="">
+                      <h5 class="">لا يوجد</h5>
+                      <p class="card-text"></p>
+                       
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <% } %>
+         <% } %>   
+      </div>
+    </div>
+    <div class="some-posts-contaner">
+      <div class="some-posts-text">
+      المشاريع المعروضة-مقاولات
+      </div>
+      <div class="some-posts-btn">
+        <form action="/uploaded" method="post"> <button class="btn btn-info some-posts-btn" name="upload_type" value="contractor">المزيد</button> </form> </form>
+      </div>
+    </div>
+    <div class="center-posts">
+        <div class="row">
+        
+        <%if(locals.num){ %>
+        <% contractors.forEach(contractor => { %>
+          <div class="col">
+            <div class="some-posts-posts">
+              <div class="card" style="width: 16rem;">
+                <img class="card-img-top" src="data:image/jpeg;base64,<%= contractor.images[0] %>" alt="<%= contractor.name %>" alt="Card image cap" width="250px" height="143px" overflow="hidden">
+                <div class="card-body" >
+                  <h5 class="card-title"><%=contractor.name %></h5>
+                  <p class="card-text"><%=contractor.title %></p>
+                  <a href="/post/contractor/<%=contractor.id%>" class="btn btn-primary">المزيد من التفاصيل</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }) %>   
+          <% for(let i =0; i<(num);i++){ %>
+            <div class="col none" style="opacity: 50%;">
+              <div class="some-posts-posts">
+                <div class="card" style="width: 16rem;">
+                  <img class="card-img-top" style="background-color: rgb(161, 158, 159);" width="250px" height="143px" overflow="hidden">
+                  <div class="">
+                    <h5 class="card-title" >لا يوجد</h5>
+                    <p class="card-text"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <% } %>
+            <% } %>
+      </div>      
+    </div>
+  </div>
+  </section>
+
+
+  <section class="contact-section">
+  <div class="back_to_top"><a href="#"><i class="fa-solid fa-arrow-up-long fa-2xl" style="color: #a2aa93;" id="arrow-up"></i></a></div>
+  <div class="back_to_top"><a href="#" id="back" ><h3 > back to top </h3></a></div>
+  <footer>
+    <div class="footer">
+      <h1 class="copy">
+        all copyright for DASH
+        year
+        <% if(locals.date){ %>
+        <%=date %>
+        <% } %>
+        ©️
+      </h1>
+    </div>
+  </footer>
+</section>
+  <script src="https://kit.fontawesome.com/6aa647ab54.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+
+</html>

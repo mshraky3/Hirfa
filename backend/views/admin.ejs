@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DASH</title>
+  <link rel="icon" type="image/x-icon" href="../public/imges/logo.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="../public/style/list.css">
+</head>
+<style>body,html{padding:0%;margin:0%}#img{margin:5% 0% 5%;width:100%;height:50vh}.title-h1{display:flex;justify-content:center;align-content:center;text-align:center}.row{width:100%}.parent{height:50vh}@media(max-width:1700px){body{font-size:small}}@media(max-width:1000px){body{font-size:small}.text,p,.flex{padding:0%;margin:0%}.parent{height:auto}}</style><style>.card-title{font-size:xx-large;text-align:center}</style>
+<body>
+
+  <section id="img">
+    <div class="row">
+        <div class="col-3">
+          <a href="#posts">
+          <div class="card-img-top">
+            <img src="../public/imges/down-arrow.svg" alt="">
+          </div>
+          <div class="card-title">
+            جميع المنشورات
+            </div>
+          </a>
+        </div>
+        <div class="col-3">
+          <a href="#users">
+          <div class="card-img-top">
+            <img src="../public/imges/down-arrow.svg" alt="">
+          </div>
+          <div class="card-title">
+            جميع المستخدمين
+            </div>
+          </a>
+        </div>
+        <div class="col-3">
+          <a href="#stats">
+          <div class="card-img-top">
+            <img src="../public/imges/down-arrow.svg" alt="">
+          </div>
+          <div class="card-title">
+            الاحصائيات
+            </div>
+          </a>
+        </div>
+        <div class="col-3">
+          <a href="">
+          <div class="card-img-top">
+            <img src="../public/imges/down-arrow.svg" alt="">
+          </div>
+          <div class="card-title">
+            </div>
+          </a>
+        </div>
+    </div>
+  </section>
+  <section>
+    <div class="row">
+      <div class="col-4" id="posts">
+        <h1 class="title-h1">المكاتب الهندسية </h1>
+        <div class="content">
+          <% companies.forEach(company => { %>
+          <div class="parent">
+            <img class="div1" src="data:image/jpeg;base64,<%= company.images[0] %>" alt="<%= company.name %> Logo" width="90%">
+            <div class="div2">
+              <div class="flex-start">
+                <p><strong>COMPANY NAME:</strong> <%= company.name %></p>
+              </div>
+            </div>
+            <div class="div3">
+              <div class="flex">
+                <p>LOCATION:<%=company.location%></p>
+              </div>
+            </div>
+            <div class="div4">
+              <div class="flex">
+                <p><strong>NUMBER:</strong> <%= company.number %></p>
+              </div>
+            </div>
+            <div class="div5">
+              <div class="flex-start">
+                <p>RATING: <%= company.rating %> <span class="rating"></span></p>
+              </div>
+            </div>
+            <div class="div6">
+              <div class="text">
+                <p style="padding-top:20px; margin-bottom: -10px;"><strong><%= company.title %></strong></p>
+              </div>
+            </div>
+            <div class="div7">
+              <a href="/post/engeneering/<%=company.id%>" class="more-details">MORE DETAILS <i class="fa-sharp-duotone fa-solid fa-arrow-right-long fa-fade fa-2xl"></i></a>
+              <hr>
+              <a href="/post/delete/<%=company.id%>" class="more-details" style="color:red;"> delete the post <i class="fa-sharp-duotone fa-solid fa-arrow-right-long fa-fade fa-2xl"></i></a>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+        <div class="col-4">
+          <h1 class="title-h1">المقاولين </h1>
+          <div class="content">
+            <% contractors.forEach(contractor => { %>
+            <div class="parent">
+              <img class="div1" src="data:image/jpeg;base64,<%= contractor.images[0] %>" alt="<%= contractor.name %> Logo" width="90%">
+              <div class="div2">
+                <div class="flex-start">
+                  <p><strong>contractor NAME:</strong> <%= contractor.name %></p>
+                </div>
+              </div>
+              <div class="div3">
+                <div class="flex">
+                  <p>LOCATION: 
+                    <% if (contractor.location === 'R') { %> الرياض <% } %>
+                    <% if (contractor.location === 'B') { %> بريدة <% } %>
+                    <% if (contractor.location === 'O') { %> عنيزة <% } %></p>
+                </div>
+              </div>
+              <div class="div4">
+                <div class="flex">
+                  <p><strong>NUMBER:</strong> <%= contractor.number %></p>
+                </div>
+              </div>
+              <div class="div5">
+                <div class="flex-start">
+                  <p>RATING: <%= contractor.rating %> <span class="rating"></span></p>
+                </div>
+              </div>
+              <div class="div6">
+                <div class="text">
+                  <p style="padding-top:20px; margin-bottom: -10px;"><strong><%= contractor.title %></strong></p>
+                </div>
+              </div>
+              <div class="div7">
+                <a href="/post/contractor/<%=contractor.id%>" class="more-details">MORE DETAILS <i class="fa-sharp-duotone fa-solid fa-arrow-right-long fa-fade fa-2xl"></i></a>
+                <hr>
+                <a href="/post/delete/<%=contractor.id%>" class="more-details"  style="color:red;">delete the post  <i class="fa-sharp-duotone fa-solid fa-arrow-right-long fa-fade fa-2xl"></i></a>
+
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+          <div class="col-4">
+            <h1 class="title-h1">الافراد</h1>
+            <div class="content">
+              <% freelancers.forEach(freelancer => { %>
+              <div class="parent">
+                <img class="div1" src="data:image/jpeg;base64,<%= freelancer.images[0] %>" alt="<%= freelancer.name %> Logo" width="90%">
+                <div class="div2">
+                  <div class="flex-start">
+                    <p><strong>freelancer NAME:</strong> <%= freelancer.name %></p>
+                  </div>
+                </div>
+                <div class="div3">
+                  <div class="flex">
+                    <p>LOCATION:                                      
+                      <% if (freelancer.location === 'R') { %> الرياض <% } %>
+                      <% if (freelancer.location === 'B') { %> بريدة <% } %>
+                      <% if (freelancer.location === 'O') { %> عنيزة <% } %></p>
+                  </div>
+                </div>
+                <div class="div4">
+                  <div class="flex">
+                    <p><strong>NUMBER:</strong> <%= freelancer.number %></p>
+                  </div>
+                </div>
+                <div class="div5">
+                  <div class="flex-start">
+                    <p>RATING: <%= freelancer.rating %> <span class="rating"></span></p>
+                  </div>
+                </div>
+                <div class="div6">
+                  <div class="text">
+                    <p style="padding-top:20px; margin-bottom: -10px;"><strong><%= freelancer.title %></strong></p>
+                  </div>
+                </div>
+                <div class="div7">
+                  <a href="/post/freelancer/<%=freelancer.id%>" class="more-details">MORE DETAILS <i class="fa-sharp-duotone fa-solid fa-arrow-right-long fa-fade fa-2xl"></i></a>
+                  <hr>
+                  <a href="/post/delete/<%=freelancer.id%>" class="more-details"  style="color:red;">delete the post <i class="fa-sharp-duotone fa-solid fa-arrow-right-long fa-fade fa-2xl"></i></a>
+                </div>
+              </div>
+              <% }) %>
+            </div>
+
+          </div>
+        </div>
+      </div>
+  </section>
+  <section>
+<style>body a{color:#000;text-decoration:none}.container{width:90%}.table{width:100%}.user-list tbody td>img{position:relative;max-width:50px;float:left;margin-right:15px}.user-list tbody td .user-link{display:block;font-size:1.25em;padding-top:3px;margin-left:60px}.user-list tbody td .user-subhead{font-size:.875em;font-style:italic}.table{border-collapse:separate}.table-hover>tbody>tr:hover>td,.table-hover>tbody>tr:hover>th{background-color:#eee}.table thead>tr>th{border-bottom:1px solid #C2C2C2;padding-bottom:0}.table tbody>tr>td{font-size:.875em;background:#f5f5f5;border-top:10px solid #fff;vertical-align:middle;padding:12px 8px}.table tbody>tr>td:first-child,.table thead>tr>th:first-child{padding-left:20px}.table thead>tr>th span{border-bottom:2px solid #C2C2C2;display:inline-block;padding:0 5px;padding-bottom:5px;font-weight:400}.table thead>tr>th>a span{color:#344644}.table thead>tr>th>a span:after{content:"\f0dc";font-family:FontAwesome;font-style:normal;font-weight:400;text-decoration:inherit;margin-left:5px;font-size:.75em}.table thead>tr>th>a.asc span:after{content:"\f0dd"}.table thead>tr>th>a.desc span:after{content:"\f0de"}.table thead>tr>th>a:hover span{text-decoration:none;color:#2bb6a3;border-color:#2bb6a3}.table.table-hover tbody>tr>td{-webkit-transition:background-color 0.15s ease-in-out 0s;transition:background-color 0.15s ease-in-out 0s}.table tbody tr td .call-type{display:block;font-size:.75em;text-align:center}.table tbody tr td .first-line{line-height:1.5;font-weight:400;font-size:1.125em}.table tbody tr td .first-line span{font-size:.875em;color:#969696;font-weight:300}.table tbody tr td .second-line{font-size:.875em;line-height:1.2}.table a.table-link{margin:0 5px;font-size:1.125em}.table a.table-link:hover{text-decoration:none;color:#2aa493}.table a.table-link.danger{color:#fe635f}.table a.table-link.danger:hover{color:#dd504c}.table-products tbody>tr>td{background:none;border:none;border-bottom:1px solid #ebebeb;-webkit-transition:background-color 0.15s ease-in-out 0s;transition:background-color 0.15s ease-in-out 0s;position:relative}.table-products tbody>tr:hover>td{text-decoration:none;background-color:#f6f6f6}.table-products .name{display:block;font-weight:600;padding-bottom:7px}.table-products .price{display:block;text-decoration:none;width:50%;float:left;font-size:.875em}.table-products .price>i{color:#8dc859}.table-products .warranty{display:block;text-decoration:none;width:50%;float:left;font-size:.875em}.table-products .warranty>i{color:#f1c40f}.table tbody>tr.table-line-fb>td{background-color:#9daccb;color:#262525}.table tbody>tr.table-line-twitter>td{background-color:#9fccff;color:#262525}.table tbody>tr.table-line-plus>td{background-color:#eea59c;color:#262525}.table-stats .status-social-icon{font-size:1.9em;vertical-align:bottom}.table-stats .table-line-fb .status-social-icon{color:#556484}.table-stats .table-line-twitter .status-social-icon{color:#5885b8}.table-stats .table-line-plus .status-social-icon{color:#a75d54}</style>
+  <center>
+  <div class="container">
+  <div class="row" id="users">
+    <div class="col-lg-12">
+      <div class="main-box clearfix">
+        <div class="table-responsive">
+          <table class="table user-list">
+            <thead>
+              <tr>
+                <th><span>User</span></th>
+                <th><span>location</span></th>
+                <th class="text-center"><span>account type</span></th>
+                <th><span>Email</span></th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody> 
+                          <% accounts.forEach(account =>{ %>
+                              <tr>
+                                  <td>
+                                      <% if (account.logo_image.length > 0) { %>
+                                          <img src="data:image/jpeg;base64,<%= account.logo_image[0] %>" alt="Logo Image">
+                                      <% } else { %>
+                                          <img src="default-logo.png" alt="Default Logo">
+                                      <% } %>
+                                      <a href="#" class="user-link"><%= account.name %></a>
+                                      <span class="user-subhead"></span>
+                                  </td>
+                                  <td>
+                                      <% if (account.location === 'R') { %> الرياض <% } %>
+                                      <% if (account.location === 'B') { %> بريدة <% } %>
+                                      <% if (account.location === 'O') { %> عنيزة <% } %>
+                                  </td>
+                                  <td class="text-center">
+                                      <span class="label label-default"><%= account.account_type %></span>
+                                  </td>
+                                  <td>
+                                      <a href="mailto:<%= account.email %>"><%= account.email %></a>
+                                  </td>
+                                  <td style="width: 20%;">
+                                      <a href="#" class="table-link">
+                                          <span class="fa-stack">
+                                              <i class="fa fa-square fa-stack-2x"></i>
+                                              <i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
+                                          </span>
+                                      </a>
+                                      <a href="#" class="table-link">
+                                          <span class="fa-stack">
+                                              <i class="fa fa-square fa-stack-2x"></i>
+                                              <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                                          </span>
+                                      </a>
+                                      <a href="#" class="table-link danger">
+                                          <span class="fa-stack">
+                                              <form action="/account/delete/<%=account.id%>" method="get"><button style=" all: unset; color:red;">delete</button></form>
+                                              <i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+                                          </span>
+                                      </a>
+                                  </td>
+                              </tr>
+                              
+                          <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </center>
+  </section>
+
+  <section id="stats">
+    <style>.dashboard{text-align:center;margin:10%}h1{margin-bottom:20px}.stats-container{display:flex;justify-content:space-around;width:80%;margin:0 auto;margin-bottom:5%}.stat-card{background-color:#fff;border-radius:8px;box-shadow:0 4px 8px rgb(0 0 0 / .1);padding:20px;width:30%;text-align:center}.stat-card h2{margin:0 0 10px}.stat-card p{font-size:24px;margin:0}</style>
+
+  <div class="dashboard">
+
+    <h1>العدد الاجمالي لمستخدمين الموقع</h1>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h2>المستحدمين</h2>
+        <p id="company-count"><%=allStats%></p>
+      </div>
+      <div class="stat-card">
+        <h2>المنشورات</h2>
+        <p id="contractor-count"><%=allPosts%></p>
+      </div>
+    </div>
+    <h1>العدد التفصيلي </h1>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h2>المكاتب الهندسية</h2>
+        <p id="company-count"><%=companyStats%></p>
+      </div>
+      <div class="stat-card">
+        <h2>المقاولين</h2>
+        <p id="contractor-count"> <%=contractorStats%></p>
+      </div>
+      <div class="stat-card">
+        <h2>الافراد</h2>
+        <p id="freelancer-count"><%=freelancerStats %>
+        </p>
+      </div>
+    </div>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h2>اصحاب المشاريع</h2>
+        <p id="company-count"><%=usersStats%>
+        </p>
+      </div>
+      <div class="stat-card">
+        <h2>عدد المشاريع المنشورة</h2>
+        <p id="contractor-count"><%=postsStats %></p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+</body>
+
+</html>
