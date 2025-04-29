@@ -20,6 +20,7 @@ const Register = () => {
     });
     const [error, setError] = useState("");
     const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+    const [isLocationFetched, setIsLocationFetched] = useState(false); // Track if location was fetched
 
     useEffect(() => {
         if (location.state?.message) {
@@ -59,6 +60,8 @@ const Register = () => {
                         location: googleMapsLink,
                     }));
                     setIsLoadingLocation(false);
+                    setIsLocationFetched(true); // Mark location as fetched
+                    alert("Location fetched successfully!"); // Alert the user
                 },
                 (error) => {
                     console.error("Error getting location:", error);
@@ -74,11 +77,39 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.location) {
-            setError("Location is required.");
+
+        // Validate form fields
+        const missingFields = [];
+        const requiredFields = [
+            "name",
+            "username",
+            "password",
+            "confirm_password",
+            "location",
+            "phone_number",
+            "description",
+            "account_type",
+        ];
+
+        requiredFields.forEach((field) => {
+            if (!formData[field] && field !== "logo_image") {
+                missingFields.push(field.replace(/_/g, " ").toUpperCase());
+            }
+        });
+
+        // Check for password mismatch
+        if (formData.password !== formData.confirm_password) {
+            setError("Passwords do not match.");
             return;
         }
 
+        // If there are missing fields, display an error
+        if (missingFields.length > 0) {
+            setError(`The following fields are required: ${missingFields.join(", ")}`);
+            return;
+        }
+
+        // Prepare form data for submission
         const formDataToSend = new FormData();
         formDataToSend.append("name", formData.name);
         formDataToSend.append("username", formData.username);
@@ -96,7 +127,7 @@ const Register = () => {
         const host = process.env.REACT_APP_HOST;
 
         try {
-            const response = await axios.post(host + "/api/register", formDataToSend);
+            const response = await axios.post(host + "/register", formDataToSend);
             if (response.status === 200) {
                 navigate("/login", { state: { message: response.data.message } });
             }
@@ -189,12 +220,15 @@ const Register = () => {
                     <div style={{ display: "flex", alignItems: "center" }}>
                         <button
                             type="button"
-                            className="btn btn-secondary"
+                            className={`btn btn-secondary ${isLocationFetched ? "fetched-location" : ""}`}
                             onClick={getLocation}
                             disabled={isLoadingLocation}
-                            style={{ marginLeft: "10px" }}
+                            style={{
+                                marginLeft: "10px",
+                                backgroundColor: isLocationFetched ? "#28a745" : "", // Green background if location fetched
+                            }}
                         >
-                            {isLoadingLocation ? "Loading..." : "Get Location"}
+                            {isLoadingLocation ? "Loading..." : isLocationFetched ? "Location Fetched!" : "Get Location"}
                         </button>
                     </div>
                 </div>
@@ -231,7 +265,7 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     >
-                        <option value="worker">Company</option>
+                        <option value="worker">Worker</option>
                         <option value="user">User</option>
                     </select>
                 </div>
