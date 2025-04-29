@@ -57,16 +57,15 @@ app.post("/api/register", async (req, res) => {
             password,
             location,
             phone_number,
-            email,
-            website_url,
             description,
             account_type,
         } = req.body;
 
-        const logo_image = req.files.logo_image; // Get the uploaded file
+        const logo_image = req.files?.logo_image; // Get the uploaded file
 
-        // Validate required fields
-        if (!name || !username || !password || !location || !phone_number || !email || !account_type) {
+        // Check if all required fields are provided
+        if (!name || !username || !password || !location || !phone_number || !account_type) {
+            console.log("All fields are required.");
             return res.status(400).json({ mseeg: "All fields are required." });
         }
 
@@ -84,115 +83,51 @@ app.post("/api/register", async (req, res) => {
             return res.status(400).json({ mseeg: "Image size must be under 50 MB." });
         }
 
-        // Check if the username already exists
-        const checkResult = await db.query("SELECT 1 FROM account WHERE username = $1", [username]);
-        if (checkResult.rows.length > 0) {
-            return res.status(400).json({ mseeg: "Username is already used, try to login or use another username." });
-        }
-
         // Convert image to WebP format
         let webpImageBuffer;
         try {
             webpImageBuffer = await sharp(logo_image.data)
-                .webp({ quality: 80 }) // Adjust quality as needed (80% is a good balance)
+                .webp({ quality: 80 })
                 .toBuffer();
         } catch (sharpError) {
             console.error("Image conversion error:", sharpError);
             return res.status(400).json({ mseeg: "Invalid image file. Please upload a valid image." });
         }
 
+        // Check if the username already exists in the database
+        const checkUsernameQuery = "SELECT * FROM account WHERE username = $1";
+        const checkUsernameResult = await db.query(checkUsernameQuery, [username]);
+
+        if (checkUsernameResult.rows.length > 0) {
+            // Username already exists
+            return res.status(400).json({ mseeg: "This username is already taken. Please log in or choose a different username." });
+        }
+
+        // Insert into database
         const insertQuery = `
             INSERT INTO account (
-                username, password, name, logo_image, location, phone_number, email, website_url, rating, description, account_type
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                username, password, name, logo_image, location, phone_number, description, account_type
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         `;
         const values = [
             username,
             password,
             name,
-            webpImageBuffer, // Store the converted WebP image
+            webpImageBuffer,
             location,
             phone_number,
-            email,
-            website_url,
-            0, // Default rating
             description,
             account_type,
         ];
 
         const dbres = await db.query(insertQuery, values);
-        console.log(dbres)
+        console.log(dbres);
+
         // Return success response
         return res.status(200).json({ message: "Registration successful! Please login." });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ mseeg: "An error occurred during registration." });
-    }
-});
-
-
-
-app.get("/api/Posts", async (req, res) => {
-    try {
-        // Query to fetch all posts
-        const postsQuery = `
-            SELECT 
-                p.post_id,
-                p.account_name,
-                p.location,
-                p.description,
-                p.account_id,
-                p.post_title
-            FROM 
-                posts p
-        `;
-        const postsResult = await db.query(postsQuery);
-
-        // Extract post IDs for fetching images
-        const postIds = postsResult.rows.map(post => post.post_id);
-
-        // Query to fetch all images for the fetched posts
-        const imagesQuery = `
-            SELECT 
-                pi.image_id,
-                pi.image,
-                pi.post_id
-            FROM 
-                post_images pi
-            WHERE 
-                pi.post_id = ANY($1)
-        `;
-        const imagesResult = await db.query(imagesQuery, [postIds]);
-
-        // Organize the data into a structured format
-        const postsWithImages = postsResult.rows.map(post => {
-            const imagesForPost = imagesResult.rows
-                .filter(imageRow => imageRow.post_id === post.post_id)
-                .map(imageRow => ({
-                    image_id: imageRow.image_id,
-                    image: imageRow.image ? imageRow.image.toString('base64') : null,
-                }));
-            return {
-                post_id: post.post_id,
-                account_name: post.account_name,
-                location: post.location,
-                description: post.description,
-                account_id: post.account_id,
-                post_title: post.post_title,
-                images: imagesForPost,
-            };
-        });
-
-        res.status(200).json({
-            success: true,
-            data: postsWithImages,
-        });
-    } catch (err) {
-        console.error("Error fetching posts and images:", err);
-        res.status(500).json({
-            success: false,
-            error: "An error occurred while fetching posts and images.",
-        });
     }
 });
 
@@ -211,25 +146,11 @@ app.post("/api/profile", async (req, res) => {
                 a.logo_image,
                 a.location,
                 a.phone_number,
-                a.email,
-                a.website_url,
-                a.rating,
-                a.rating_length,
                 a.description AS account_description,
-                a.account_type,
-                p.post_id,
-                p.account_name AS post_account_name,
-                p.location AS post_location,
-                p.description AS post_description,
-                p.post_title,
-                pi.image_id,
-                pi.image AS post_image
+                a.account_type
             FROM 
                 public.account a
-            LEFT JOIN 
-                public.posts p ON a.id = p.account_id
-            LEFT JOIN 
-                public.post_images pi ON p.post_id = pi.post_id
+
             WHERE 
                 a.id = $1;
         `;
@@ -245,36 +166,13 @@ app.post("/api/profile", async (req, res) => {
             logo_image: result.rows[0].logo_image,
             location: result.rows[0].location,
             phone_number: result.rows[0].phone_number,
-            email: result.rows[0].email,
-            website_url: result.rows[0].website_url,
-            rating: result.rows[0].rating,
-            rating_length: result.rows[0].rating_length,
             description: result.rows[0].account_description,
             account_type: result.rows[0].account_type,
-            posts: [],
+         
         };
 
-        const postsMap = new Map();
-        result.rows.forEach(row => {
-            if (row.post_id && !postsMap.has(row.post_id)) {
-                postsMap.set(row.post_id, {
-                    post_id: row.post_id,
-                    account_name: row.post_account_name,
-                    location: row.post_location,
-                    description: row.post_description,
-                    post_title: row.post_title,
-                    images: [],
-                });
-            }
-            if (row.post_id && row.image_id) {
-                postsMap.get(row.post_id).images.push({
-                    image_id: row.image_id,
-                    image: row.post_image,
-                });
-            }
-        });
 
-        accountData.posts = Array.from(postsMap.values());
+
         res.status(200).json(accountData);
     } catch (error) {
         console.error("Error fetching profile data:", error);
@@ -282,69 +180,171 @@ app.post("/api/profile", async (req, res) => {
     }
 });
 
-app.post("/api/addpost", async (req, res) => {
+
+
+
+app.get("/api/Workers", async (req, res) => {
     try {
-        const {
-            account_name,
-            location,
-            description,
-            account_id,
-            post_title,
-        } = req.body;
-
-        // Check if files were uploaded
-        if (!req.files || !req.files.images) {
-            return res.status(400).json({ error: "No images uploaded." });
-        }
-
-        const images = Array.isArray(req.files.images)
-            ? req.files.images
-            : [req.files.images];
-
-        // Insert post into the `posts` table
-        const postInsertQuery = `
-            INSERT INTO posts (
-                account_name, location, description, account_id, post_title
-            ) VALUES ($1, $2, $3, $4, $5)
-            RETURNING post_id
+        // Query to fetch all worker accounts
+        const workersQuery = `
+            SELECT 
+                id,
+                name AS account_name,
+                location,
+                description,
+                account_type,
+                logo_image
+            FROM 
+                account
+            WHERE 
+                account_type = 'worker'
         `;
-        const postValues = [
-            account_name,
-            location,
-            description,
-            account_id,
-            post_title,
-        ];
-        const postResult = await db.query(postInsertQuery, postValues);
-        const postId = postResult.rows[0].post_id;
+        const workersResult = await db.query(workersQuery);
 
-        // Process and store images in the `post_images` table
-        for (const image of images) {
-            // Convert image to WebP format
-            const webpImageBuffer = await sharp(image.data)
-                .webp({ quality: 80 })
-                .toBuffer();
+        // Convert logo images to base64 if they exist
+        const workersWithImages = workersResult.rows.map(worker => ({
+            account_id: worker.id,
+            account_name: worker.account_name,
+            location: worker.location,
+            description: worker.description,
+            account_type: worker.account_type,
+            logo_image: worker.logo_image ? worker.logo_image.toString('base64') : null,
+        }));
 
-            const imageInsertQuery = `
-                INSERT INTO post_images (image, post_id)
-                VALUES ($1, $2)
-            `;
-            const imageValues = [webpImageBuffer, postId];
-            await db.query(imageInsertQuery, imageValues);
-        }
-
-        res.status(200).json({ message: "Post added successfully!" });
+        res.status(200).json({
+            success: true,
+            data: workersWithImages,
+        });
     } catch (err) {
-        console.error("Error adding post:", err);
-        res.status(500).json({ error: "An error occurred while adding the post." });
+        console.error("Error fetching worker accounts:", err);
+        res.status(500).json({
+            success: false,
+            error: "An error occurred while fetching worker accounts.",
+        });
     }
 });
-
-
-
 
 app.listen(process.env.port, () => {
     console.log('Server is running on port' + process.env.port);
 });
 
+// app.post("/api/addpost", async (req, res) => {
+//     try {
+//         const {
+//             account_name,
+//             location,
+//             description,
+//             account_id,
+//             post_title,
+//         } = req.body;
 
+//         // Check if files were uploaded
+//         if (!req.files || !req.files.images) {
+//             return res.status(400).json({ error: "No images uploaded." });
+//         }
+
+//         const images = Array.isArray(req.files.images)
+//             ? req.files.images
+//             : [req.files.images];
+
+//         // Insert post into the `posts` table
+//         const postInsertQuery = `
+//             INSERT INTO posts (
+//                 account_name, location, description, account_id, post_title
+//             ) VALUES ($1, $2, $3, $4, $5)
+//             RETURNING post_id
+//         `;
+//         const postValues = [
+//             account_name,
+//             location,
+//             description,
+//             account_id,
+//             post_title,
+//         ];
+//         const postResult = await db.query(postInsertQuery, postValues);
+//         const postId = postResult.rows[0].post_id;
+
+//         // Process and store images in the `post_images` table
+//         for (const image of images) {
+//             // Convert image to WebP format
+//             const webpImageBuffer = await sharp(image.data)
+//                 .webp({ quality: 80 })
+//                 .toBuffer();
+
+//             const imageInsertQuery = `
+//                 INSERT INTO post_images (image, post_id)
+//                 VALUES ($1, $2)
+//             `;
+//             const imageValues = [webpImageBuffer, postId];
+//             await db.query(imageInsertQuery, imageValues);
+//         }
+
+//         res.status(200).json({ message: "Post added successfully!" });
+//     } catch (err) {
+//         console.error("Error adding post:", err);
+//         res.status(500).json({ error: "An error occurred while adding the post." });
+//     }
+// });
+// app.get("/api/Posts", async (req, res) => {
+//     try {
+//         // Query to fetch all posts
+//         const postsQuery = `
+//             SELECT 
+//                 p.post_id,
+//                 p.account_name,
+//                 p.location,
+//                 p.description,
+//                 p.account_id,
+//                 p.post_title
+//             FROM 
+//                 posts p
+//         `;
+//         const postsResult = await db.query(postsQuery);
+
+//         // Extract post IDs for fetching images
+//         const postIds = postsResult.rows.map(post => post.post_id);
+
+//         // Query to fetch all images for the fetched posts
+//         const imagesQuery = `
+//             SELECT 
+//                 pi.image_id,
+//                 pi.image,
+//                 pi.post_id
+//             FROM 
+//                 post_images pi
+//             WHERE 
+//                 pi.post_id = ANY($1)
+//         `;
+//         const imagesResult = await db.query(imagesQuery, [postIds]);
+
+//         // Organize the data into a structured format
+//         const postsWithImages = postsResult.rows.map(post => {
+//             const imagesForPost = imagesResult.rows
+//                 .filter(imageRow => imageRow.post_id === post.post_id)
+//                 .map(imageRow => ({
+//                     image_id: imageRow.image_id,
+//                     image: imageRow.image ? imageRow.image.toString('base64') : null,
+//                 }));
+//             return {
+//                 post_id: post.post_id,
+//                 account_name: post.account_name,
+//                 location: post.location,
+//                 description: post.description,
+//                 account_id: post.account_id,
+//                 post_title: post.post_title,
+//                 images: imagesForPost,
+//             };
+//         });
+
+//         res.status(200).json({
+//             success: true,
+//             data: postsWithImages,
+//         });
+//     } catch (err) {
+//         console.error("Error fetching posts and images:", err);
+//         res.status(500).json({
+//             success: false,
+//             error: "An error occurred while fetching posts and images.",
+//         });
+//     }
+// });
