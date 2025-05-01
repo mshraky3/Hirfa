@@ -18,9 +18,9 @@ function App() {
 
             return () => clearTimeout(timer);
         } else {
-            setStats(null); // Reset stats if location.data is null or undefined
+            setStats(null); 
         }
-    }, [location.state]); // Ensure location.data is a dependency
+    }, [location.state]); 
 
     return (
         <div className="app-container">
@@ -31,7 +31,6 @@ function App() {
             )}
             
             <Header isUser={data?.isUser} UserID={data?.UserID} ThisUserID={data?.ThisUserID} Type={data?.Type} />
-
             <List  ThisUserID={data?.ThisUserID} />
             <About />
             <Footer />

@@ -6,7 +6,7 @@ import App from './App.jsx';
 import Login from '../components/Login/Login.jsx';
 import Register from '../components/Login/register.jsx';
 import Profile from '../components/profile/profile.jsx';
-import AddPost from '../components/Posts/Post/AddPost.jsx';
+import Workers from '../components/Workers/Workers.jsx';
 
 
 
@@ -30,9 +30,10 @@ const router = createBrowserRouter([
         element: <Profile />
     },
     {
-        path: "/addpost",
-        element: <AddPost />
-    }
+        path: "/workers",
+        element: <Workers />
+    },
+
 ]);
 
 
