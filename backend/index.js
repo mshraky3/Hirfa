@@ -264,8 +264,6 @@ app.get("/api/Workers/types", async (req, res) => {
 
 app.post("/api/Workers/filter", async (req, res) => {
     const { userLat, userLng, workerType, page = 1 } = req.body;
-
-    // Validate inputs
     if (typeof userLat !== 'number' || typeof userLng !== 'number' || 
         isNaN(userLat) || isNaN(userLng) || !workerType || typeof workerType !== 'string') {
         return res.status(400).json({ error: 'Invalid request parameters' });
