@@ -6,6 +6,7 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import cors from "cors";
 import sharp from 'sharp'; // Add this import at the top with other imports
+import { console } from "inspector";
 
 
 dotenv.config();
@@ -22,22 +23,20 @@ const upload = multer({
     storage: storage
 });
 
-// const db=new pg.Client({user:"users_x5qf_user",host:"dpg-crd1mqg8fa8c73bg324g-a",port:5432,password:"gdFRLYxirPld1F0MrJ1rsK6LVlDDvFjj",database:"users_x5qf",})
 const db = new pg.Client({ password: process.env.password, host: process.env.host, database: process.env.db, user: process.env.user, port: 5432 })
 db.connect()
 
 
 app.post("/api/login", async (req, res) => {
-    const { email , password } = req.body;
-    console.log(email , password)
+    const { email, password } = req.body;
+    console.log(email, password)
     try {
-        const result = await db.query(`SELECT id, password, account_type FROM account WHERE username = $1`,[email]);
+        const result = await db.query(`SELECT id, password FROM account WHERE username = $1`, [email]);
         if (result.rows.length > 0 && result.rows[0].password === password) {
             res.json({
                 message: "Login successful",
                 stats: 200,
                 id: result.rows[0].id,
-                account_type:result.rows[0].account_type
             })
         } else {
             res.json({ stats: 201 })
@@ -58,76 +57,107 @@ app.post("/api/register", async (req, res) => {
             location,
             phone_number,
             description,
-            account_type,
+            working_in
         } = req.body;
 
-        const logo_image = req.files?.logo_image; // Get the uploaded file
+        const logo_image = req.files?.logo_image; // Optional image upload
 
-        // Check if all required fields are provided
-        if (!name || !username || !password || !location || !phone_number || !account_type) {
-            console.log("All fields are required.");
-            return res.status(400).json({ mseeg: "All fields are required." });
+        // Validate required fields
+        if (!name || !username || !password || !location || !phone_number || !description || !working_in) {
+            return res.status(400).json({
+                mseeg: "All fields are required: name, username, password, location, phone number, description, and working field."
+            });
         }
 
         // Validate password length
         if (password.length < 8) {
-            return res.status(400).json({ mseeg: "The password must be more than 8 characters long." });
+            return res.status(400).json({
+                mseeg: "Password must be at least 8 characters long."
+            });
         }
 
-        // Validate file upload
-        if (!logo_image) {
-            return res.status(400).json({ mseeg: "Please select an image." });
+        let webpImageBuffer = null;
+
+        // Process image only if uploaded
+        if (logo_image) {
+            if (logo_image.size > 50 * 1024 * 1024) {
+                return res.status(400).json({
+                    mseeg: "Image size must be under 50 MB."
+                });
+            }
+
+            try {
+                webpImageBuffer = await sharp(logo_image.data)
+                    .webp({ quality: 80 })
+                    .toBuffer();
+            } catch (sharpError) {
+                console.error("Image conversion error:", sharpError);
+                return res.status(400).json({
+                    mseeg: "Invalid image file. Please upload a valid image."
+                });
+            }
         }
 
-        if (logo_image.size > 50 * 1024 * 1024) {
-            return res.status(400).json({ mseeg: "Image size must be under 50 MB." });
-        }
-
-        // Convert image to WebP format
-        let webpImageBuffer;
-        try {
-            webpImageBuffer = await sharp(logo_image.data)
-                .webp({ quality: 80 })
-                .toBuffer();
-        } catch (sharpError) {
-            console.error("Image conversion error:", sharpError);
-            return res.status(400).json({ mseeg: "Invalid image file. Please upload a valid image." });
-        }
-
-        // Check if the username already exists in the database
+        // Check if username already exists
         const checkUsernameQuery = "SELECT * FROM account WHERE username = $1";
         const checkUsernameResult = await db.query(checkUsernameQuery, [username]);
 
         if (checkUsernameResult.rows.length > 0) {
-            // Username already exists
-            return res.status(400).json({ mseeg: "This username is already taken. Please log in or choose a different username." });
+            return res.status(400).json({
+                mseeg: "This username is already taken. Please choose a different one."
+            });
         }
 
-        // Insert into database
-        const insertQuery = `
-            INSERT INTO account (
-                username, password, name, logo_image, location, phone_number, description, account_type
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        `;
-        const values = [
-            username,
-            password,
-            name,
-            webpImageBuffer,
-            location,
-            phone_number,
-            description,
-            account_type,
-        ];
+        // Prepare and execute the insert query
+        let insertQuery;
+        let values;
+
+        if (webpImageBuffer) {
+            insertQuery = `
+                INSERT INTO account (
+                    username, password, name, logo_image, location, phone_number, description, working_in
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            `;
+            values = [
+                username,
+                password,
+                name,
+                webpImageBuffer,
+                location,
+                phone_number,
+                description,
+                working_in
+            ];
+        } else {
+            insertQuery = `
+                INSERT INTO account (
+                    username, password, name, location, phone_number, description, working_in
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `;
+            values = [
+                username,
+                password,
+                name,
+                location,
+                phone_number,
+                description,
+                working_in
+            ];
+        }
 
         const dbres = await db.query(insertQuery, values);
+
         console.log(dbres);
 
-        // Return success response
-        return res.status(200).json({ message: "Registration successful! Please login." });
+        return res.status(200).json({
+            message: "Registration successful! Please log in."
+        });
+
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ mseeg: "An error occurred during registration." });
+        return res.status(500).json({
+            mseeg: "An error occurred during registration."
+        });
     }
 });
 
@@ -146,8 +176,8 @@ app.post("/api/profile", async (req, res) => {
                 a.logo_image,
                 a.location,
                 a.phone_number,
-                a.description AS account_description,
-                a.account_type
+                a.description AS account_description
+         
             FROM 
                 public.account a
 
@@ -166,9 +196,8 @@ app.post("/api/profile", async (req, res) => {
             logo_image: result.rows[0].logo_image,
             location: result.rows[0].location,
             phone_number: result.rows[0].phone_number,
-            description: result.rows[0].account_description,
-            account_type: result.rows[0].account_type,
-         
+            description: result.rows[0].account_description
+
         };
 
 
@@ -185,29 +214,22 @@ app.post("/api/profile", async (req, res) => {
 
 app.get("/api/Workers", async (req, res) => {
     try {
-        // Query to fetch all worker accounts
         const workersQuery = `
             SELECT 
                 id,
                 name AS account_name,
                 location,
                 description,
-                account_type,
                 logo_image
             FROM 
                 account
-            WHERE 
-                account_type = 'worker'
         `;
         const workersResult = await db.query(workersQuery);
-
-        // Convert logo images to base64 if they exist
         const workersWithImages = workersResult.rows.map(worker => ({
             account_id: worker.id,
             account_name: worker.account_name,
             location: worker.location,
             description: worker.description,
-            account_type: worker.account_type,
             logo_image: worker.logo_image ? worker.logo_image.toString('base64') : null,
         }));
 
@@ -223,6 +245,88 @@ app.get("/api/Workers", async (req, res) => {
         });
     }
 });
+
+app.get("/api/Workers/types", async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT DISTINCT working_in 
+            FROM account 
+            WHERE working_in IS NOT NULL AND working_in <> ''
+            ORDER BY working_in
+        `);
+        const types = result.rows.map(row => row.working_in.trim()).filter(Boolean);
+        res.json({ types });
+    } catch (err) {
+        console.error("Failed to fetch worker types:", err);
+        res.status(500).json({ error: 'Failed to fetch worker types' });
+    }
+});
+
+app.post("/api/Workers/filter", async (req, res) => {
+    const { userLat, userLng, workerType, page = 1 } = req.body;
+
+    // Validate inputs
+    if (typeof userLat !== 'number' || typeof userLng !== 'number' || 
+        isNaN(userLat) || isNaN(userLng) || !workerType || typeof workerType !== 'string') {
+        return res.status(400).json({ error: 'Invalid request parameters' });
+    }
+
+    const limit = 15;
+    const offset = (page - 1) * limit;
+
+    try {
+        const query = `
+            SELECT 
+                id, 
+                name, 
+                phone_number,
+                working_in,
+                encode(logo_image, 'base64') AS logo_image,
+                ROUND(
+                    6371 * 2 * ASIN(SQRT(
+                        POWER(SIN(($1 - lat) * PI()/180 / 2), 2) +
+                        COS($1 * PI()/180) * COS(lat * PI()/180) *
+                        POWER(SIN(($2 - lng) * PI()/180 / 2), 2)
+                    ))::numeric, 2
+                ) AS distance
+            FROM (
+                SELECT 
+                    id, 
+                    name, 
+                    phone_number,
+                    working_in,
+                    logo_image,
+                    (regexp_match(location, 'q=([+-]?\\d+(?:\\.\\d+)?),([+-]?\\d+(?:\\.\\d+)?)'))[1]::FLOAT AS lat,
+                    (regexp_match(location, 'q=([+-]?\\d+(?:\\.\\d+)?),([+-]?\\d+(?:\\.\\d+)?)'))[2]::FLOAT AS lng
+                FROM account
+                WHERE working_in = $3
+                AND location ~* 'q=([+-]?\\d+(?:\\.\\d+)?),([+-]?\\d+(?:\\.\\d+)?)'
+            ) AS subquery
+            WHERE lat IS NOT NULL AND lng IS NOT NULL
+            ORDER BY distance ASC
+            LIMIT $4 OFFSET $5;
+        `;
+
+        const values = [userLat, userLng, workerType, limit, offset];
+        const result = await db.query(query, values);
+
+        res.json({ 
+            workers: result.rows,
+            page,
+            hasMore: result.rows.length === limit
+        });
+    } catch (err) {
+        console.error("Error fetching workers:", err);
+        res.status(500).json({ error: 'Failed to fetch workers' });
+    }
+});
+
+
+
+
+
+
+
 
 app.listen(process.env.port, () => {
     console.log('Server is running on port' + process.env.port);
@@ -289,14 +393,14 @@ app.listen(process.env.port, () => {
 //     try {
 //         // Query to fetch all posts
 //         const postsQuery = `
-//             SELECT 
+//             SELECT
 //                 p.post_id,
 //                 p.account_name,
 //                 p.location,
 //                 p.description,
 //                 p.account_id,
 //                 p.post_title
-//             FROM 
+//             FROM
 //                 posts p
 //         `;
 //         const postsResult = await db.query(postsQuery);
@@ -306,13 +410,13 @@ app.listen(process.env.port, () => {
 
 //         // Query to fetch all images for the fetched posts
 //         const imagesQuery = `
-//             SELECT 
+//             SELECT
 //                 pi.image_id,
 //                 pi.image,
 //                 pi.post_id
-//             FROM 
+//             FROM
 //                 post_images pi
-//             WHERE 
+//             WHERE
 //                 pi.post_id = ANY($1)
 //         `;
 //         const imagesResult = await db.query(imagesQuery, [postIds]);
