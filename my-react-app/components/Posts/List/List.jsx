@@ -14,7 +14,6 @@ const List = () => {
             try {
                 const host = process.env.REACT_APP_HOST;
                 const response = await axios.get(host + "/Workers");
-
                 if (response.status === 200 && Array.isArray(response.data?.data)) {
                     setWorkers(response.data.data);
                 } else {

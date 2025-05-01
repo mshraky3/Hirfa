@@ -10,7 +10,7 @@ const Navbar = (props) => {
     const navigate = useNavigate();
     function To_profile(id) {
 
-        navigate('/profile', { state: { UserID: id , ThisUserID:props.ThisUserID , Type:props.Type } } )
+        navigate('/profile', { state: { UserID: id, ThisUserID: props.ThisUserID } })
     }
 
 
@@ -27,18 +27,19 @@ const Navbar = (props) => {
                     </li>
                     <li className='links-cont'>
                         <div className='links-cot'>
-                            <Link className="nav-link" to='/login' >انشر مشروعك </Link>
-                            <Link className="nav-link" to='/login' >ابحث عن عميل </Link>
+                            <Link className="nav-link" to='/workers' >
+                                قائمة الحرفيين 
+                            </Link>
 
 
 
                             {props.isUser ? (
-                                <div div className="nav-link"
-                                    onClick={() => { To_profile(props.UserID) }}
-                                > profile</div>
+                                <div div className="nav-link" onClick={() => { To_profile(props.UserID) }}>profile</div>
                             ) : (
                                 <>
-                                    <Link className="nav-link" to='/login' >login</Link>
+                                    <Link className="nav-link" to='/login' >
+                                        بحث عن عمل 
+                                    </Link>
                                 </>
                             )}
                         </div>

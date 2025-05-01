@@ -28,24 +28,23 @@ html{
 .header-buttons{
     display: flex;
     justify-content: center;
-    align-items: center;
     margin-top: 20px;
-    gap: 20%;
+
+
 }
 
 .header-buttons button{
     background-color: #141414; /* Green */
     border: none;
     color: white;
-    padding: 5% 10%;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 2% 1%;
     cursor: pointer;
     border-radius: 8px;
+    font-size: x-large;
+    white-space: nowrap;
+    padding: 5% 100%;
+    margin: 10% 1%;
 }
+
 .header-buttons button:hover{
     background-color: #505351; /* Darker green on hover */
 }

@@ -39,14 +39,12 @@ const AddPost = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         const formDataToSend = new FormData();
         formDataToSend.append('account_name', name);
         formDataToSend.append('location', formData.location);
         formDataToSend.append('description', formData.description);
         formDataToSend.append('account_id', ThisUserID);
         formDataToSend.append('post_title', formData.post_title);
-        
         formData.images.forEach(image => {
             formDataToSend.append('images', image);
         });

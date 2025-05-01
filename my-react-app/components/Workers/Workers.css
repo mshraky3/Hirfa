@@ -1,0 +1,136 @@
+.workers-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.error-message {
+    color: #d32f2f;
+    background-color: #fde0e0;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid #d32f2f;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.type-selector {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.type-selector label {
+    font-weight: bold;
+}
+
+.type-selector select {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    min-width: 200px;
+}
+
+.location-error,
+.select-type-prompt,
+.no-workers {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+    color: #666;
+    margin-top: 20px;
+}
+
+.workers-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.worker-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.worker-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.worker-image {
+    height: 150px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.worker-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.no-image {
+    color: #999;
+}
+
+.worker-info {
+    padding: 15px;
+}
+
+.worker-info h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.worker-field {
+    color: #666;
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.worker-phone {
+    color: #1976d2;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.worker-distance {
+    color: #388e3c;
+    margin: 5px 0 0 0;
+    font-size: 0.9em;
+}
+
+.load-more {
+    display: block;
+    margin: 30px auto;
+    padding: 10px 20px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+.load-more:hover {
+    background-color: #1565c0;
+}
+
+.load-more:disabled {
+    background-color: #90caf9;
+    cursor: not-allowed;
+}

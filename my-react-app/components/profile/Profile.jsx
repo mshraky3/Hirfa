@@ -79,20 +79,7 @@ function Profile() {
             </div>
           </div>
 
-          <div className="profile-footer">
-            <button className="action-button primary">Contact</button>
-            {location.state.ThisUserID === location.state.UserID &&
-            location.state.Type === 'user' ? (
-              <div
-                onClick={AddPost}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="action-button secondary"
-              >
-                Add Post
-              </div>
-            ) : null}
-          </div>
+
         </div>
       ) : (
         <div className="loading-container">
