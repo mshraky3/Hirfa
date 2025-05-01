@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 
 const Register = () => {
@@ -12,56 +12,22 @@ const Register = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoadingLocation, setIsLoadingLocation] = useState(false);
     const [isLocationFetched, setIsLocationFetched] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
 
-    const workingInOptions = [
-        {
-            category: { ar: "البناء والتشييد", en: "Construction & Building" },
-            jobs: [
-                { ar: "مقاول", en: "Contractor" },
-                { ar: "فني بلاط", en: "Tiles Installer" },
-                { ar: "فني دهان", en: "Painter" },
-                { ar: "فني أرضيات", en: "Flooring Technician" }
-            ]
-        },
-        {
-            category: { ar: "السباكة", en: "Plumbing" },
-            jobs: [
-                { ar: "سباك", en: "Plumber" }
-            ]
-        },
-        {
-            category: { ar: "الكهرباء", en: "Electricity" },
-            jobs: [
-                { ar: "كهربائي", en: "Electrician" },
-                { ar: "فني تكييف", en: "AC Technician" },
-                { ar: "فني أنظمة أمن", en: "Security Systems Technician" }
-            ]
-        },
-        {
-            category: { ar: "النقل والأثاث", en: "Moving & Furniture" },
-            jobs: [
-                { ar: "عمال نقل", en: "Movers" },
-                { ar: "نجار", en: "Carpenter" }
-            ]
-        },
-        {
-            category: { ar: "النظافة", en: "Cleaning" },
-            jobs: [
-                { ar: "عامل نظافة", en: "Cleaner" }
-            ]
-        },
-        {
-            category: { ar: "الحدائق", en: "Gardening" },
-            jobs: [
-                { ar: "بستاني", en: "Gardener" }
-            ]
-        },
-        {
-            category: { ar: "أخرى", en: "Other" },
-            jobs: [
-                { ar: "أخرى", en: "Other" }
-            ]
-        }
+    const jobOptions = [
+        { ar: "مقاول", en: "Contractor" },
+        { ar: "فني بلاط", en: "Tiles Installer" },
+        { ar: "فني دهان", en: "Painter" },
+        { ar: "فني أرضيات", en: "Flooring Technician" },
+        { ar: "سباك", en: "Plumber" },
+        { ar: "كهربائي", en: "Electrician" },
+        { ar: "فني تكييف", en: "AC Technician" },
+        { ar: "فني أنظمة أمن", en: "Security Systems Technician" },
+        { ar: "عمال نقل", en: "Movers" },
+        { ar: "نجار", en: "Carpenter" },
+        { ar: "عامل نظافة", en: "Cleaner" },
+        { ar: "بستاني", en: "Gardener" },
+        { ar: "أخرى", en: "Other" }
     ];
 
     const [formData, setFormData] = useState({
@@ -85,7 +51,7 @@ const Register = () => {
         { title: "Phone Number", key: "phone_number" },
         { title: "Location", key: "location" },
         { title: "Description", key: "description" },
-        { title: "Logo Image (Optional)", key: "logo_image" },
+        { title: "Logo Image", key: "logo_image" },
     ];
 
     useEffect(() => {
@@ -100,10 +66,24 @@ const Register = () => {
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: files ? files[0] : value,
-        }));
+        
+        if (name === "logo_image" && files && files[0]) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result);
+            };
+            reader.readAsDataURL(files[0]);
+            
+            setFormData((prev) => ({
+                ...prev,
+                [name]: files[0],
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: files ? files[0] : value,
+            }));
+        }
     };
 
     const getLocation = () => {
@@ -120,7 +100,6 @@ const Register = () => {
                     setIsLoadingLocation(false);
                     setIsLocationFetched(true);
                     setError("");
-                    alert("Location fetched successfully!");
                 },
                 (err) => {
                     setError("Failed to get your location. Please try again.");
@@ -185,6 +164,12 @@ const Register = () => {
                     return false;
                 }
                 break;
+            case "logo_image":
+                if (!formData.logo_image) {
+                    setError("يرجى تحميل صورة الشعار / Please upload a logo image.");
+                    return false;
+                }
+                break;
             default:
                 return true;
         }
@@ -209,8 +194,16 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateStep()) return;
+        
+        // Validate all steps before submitting
+        for (let i = 0; i < steps.length; i++) {
+            setCurrentStep(i);
+            if (!validateStep()) {
+                return;
+            }
+        }
 
+        // Only submit when all steps are validated
         const formDataToSend = new FormData();
         Object.keys(formData).forEach((key) => {
             if (formData[key]) {
@@ -227,7 +220,7 @@ const Register = () => {
             }
         } catch (err) {
             setError(
-                err.response?.data?.mseeg ||
+                err.response?.data?.message ||
                 "An error occurred during registration."
             );
         }
@@ -249,14 +242,10 @@ const Register = () => {
                             required
                         >
                             <option value="">-- اختر خيارًا / Choose an option --</option>
-                            {workingInOptions.map((group, index) => (
-                                <optgroup key={index} label={`${group.category.ar} / ${group.category.en}`}>
-                                    {group.jobs.map((job, i) => (
-                                        <option key={i} value={job.en}>
-                                            {job.ar} - {job.en}
-                                        </option>
-                                    ))}
-                                </optgroup>
+                            {jobOptions.map((job, i) => (
+                                <option key={i} value={job.en}>
+                                    {job.ar} - {job.en}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -342,19 +331,21 @@ const Register = () => {
                 return (
                     <div className="form-group">
                         <label htmlFor="location">موقع الشركة / Company Location</label>
-                        <p className="text-muted">اضغط الزر لجلب الموقع / Click the button to fetch your location.</p>
-                        <div style={{ display: "flex", alignItems: "center" }}>
+                        <p className="progress-text">اضغط الزر لجلب الموقع / Click the button to fetch your location.</p>
+                        <div className="location-btn">
                             <button
                                 type="button"
                                 className={`btn btn-secondary ${isLocationFetched ? "fetched-location" : ""}`}
                                 onClick={getLocation}
                                 disabled={isLoadingLocation}
-                                style={{
-                                    marginLeft: "10px",
-                                    backgroundColor: isLocationFetched ? "#28a745" : "",
-                                }}
                             >
-                                {isLoadingLocation ? "جار التحميل..." : isLocationFetched ? "تم جلب الموقع!" : "جلب الموقع / Get Location"}
+                                {isLoadingLocation ? (
+                                    "جار التحميل..."
+                                ) : isLocationFetched ? (
+                                    "✓ تم جلب الموقع"
+                                ) : (
+                                    "جلب الموقع / Get Location"
+                                )}
                             </button>
                         </div>
                     </div>
@@ -377,14 +368,47 @@ const Register = () => {
             case "logo_image":
                 return (
                     <div className="form-group">
-                        <label htmlFor="logo_image">شعار الحساب (اختياري) / Account Logo (Optional)</label>
-                        <input
-                            type="file"
-                            className="form-control-file"
-                            name="logo_image"
-                            accept=".jpg,.jpeg,.png,.gif"
-                            onChange={handleChange}
-                        />
+                        <label htmlFor="logo_image">شعار الحساب / Account Logo</label>
+                        <div className="image-upload-container">
+                            {previewImage ? (
+                                <div className="image-preview">
+                                    <img 
+                                        src={previewImage} 
+                                        alt="Logo preview" 
+                                        className="logo-preview"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary change-image-btn"
+                                        onClick={() => document.getElementById('logo_image').click()}
+                                    >
+                                        تغيير الصورة / Change Image
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="upload-area">
+                                    <label htmlFor="logo_image" className="upload-label">
+                                        <div className="upload-icon">+</div>
+                                        <div className="upload-text">
+                                            انقر لتحميل الصورة / Click to upload image
+                                        </div>
+                                    </label>
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                id="logo_image"
+                                className="form-control-file"
+                                name="logo_image"
+                                accept=".jpg,.jpeg,.png,.gif"
+                                onChange={handleChange}
+                                style={{ display: 'none' }}
+                                required
+                            />
+                        </div>
+                        <p className="file-requirements">
+                            يرجى تحميل صورة بحجم أقل من 2MB / Please upload image less than 2MB
+                        </p>
                     </div>
                 );
             default:
@@ -394,38 +418,61 @@ const Register = () => {
 
     return (
         <div className="register-container">
-            <h2>Register - Step {currentStep + 1} of {steps.length}</h2>
-            {message && (
-                <div className="message">
-                    <p>{message}</p>
-                </div>
-            )}
-            {error && (
-                <div className="error-message">
-                    <p>{error}</p>
-                </div>
-            )}
+            <div className="login-header">
+                <h2>Create Account</h2>
+                <Link to="/login" className="login-btn">
+                    LOGIN
+                </Link>
+            </div>
 
-            <form onSubmit={handleSubmit}>
-                {renderCurrentStep()}
-
-                <div className="form-navigation">
-                    {currentStep > 0 && (
-                        <button type="button" onClick={prevStep} className="btn btn-secondary">
-                            السابق / Previous
-                        </button>
-                    )}
-                    {currentStep < steps.length - 1 ? (
-                        <button type="button" onClick={nextStep} className="btn btn-primary">
-                            التالي / Next
-                        </button>
-                    ) : (
-                        <button type="submit" className="btn btn-success">
-                            تسجيل / Submit
-                        </button>
-                    )}
+            <div className="card">
+                <div className="step-indicator">
+                    {steps.map((step, index) => (
+                        <div
+                            key={index}
+                            className={`step ${currentStep === index ? "active" : ""} ${
+                                currentStep > index ? "completed" : ""
+                            }`}
+                        >
+                            {index + 1}
+                        </div>
+                    ))}
                 </div>
-            </form>
+
+                <h2>Step {currentStep + 1}: {steps[currentStep].title}</h2>
+                
+                {message && (
+                    <div className="message">
+                        <p>{message}</p>
+                    </div>
+                )}
+                {error && (
+                    <div className="error-message">
+                        <p>{error}</p>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                    {renderCurrentStep()}
+
+                    <div className="form-navigation">
+                        {currentStep > 0 && (
+                            <button type="button" onClick={prevStep} className="btn btn-secondary">
+                                السابق / Previous
+                            </button>
+                        )}
+                        {currentStep < steps.length - 1 ? (
+                            <button type="button" onClick={nextStep} className="btn btn-primary">
+                                التالي / Next
+                            </button>
+                        ) : (
+                            <button type="submit" className="btn btn-success">
+                                تسجيل / Submit
+                            </button>
+                        )}
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

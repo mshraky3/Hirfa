@@ -3,7 +3,7 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
+    background-color: #f8f9fa;
 }
 
 .register-container {
@@ -12,26 +12,96 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 20px;
-    background: linear-gradient(135deg, #eef2f7, #dce4ec);
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+}
+
+.login-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 440px;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.login-btn {
+    padding: 0.6rem 1.2rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.login-btn:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.card {
+    width: 100%;
+    max-width: 440px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    margin-bottom: 1rem;
 }
 
 h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-    color: #333333;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
     text-align: center;
+    font-weight: 600;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.step.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.step.completed {
+    background-color: #28a745;
+    color: white;
 }
 
 .message,
 .error-message {
     width: 100%;
     max-width: 400px;
-    margin-bottom: 15px;
-    padding: 10px;
-    border-radius: 4px;
+    margin-bottom: 1.2rem;
+    padding: 0.8rem;
+    border-radius: 6px;
     text-align: center;
-    font-size: 14px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .message {
@@ -48,15 +118,14 @@ h2 {
 
 .form-group {
     width: 100%;
-    max-width: 400px;
-    margin-bottom: 15px;
+    margin-bottom: 1.2rem;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: #333333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #495057;
     font-weight: 500;
 }
 
@@ -64,80 +133,117 @@ h2 {
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #cccccc;
+    padding: 0.8rem;
+    border: 1px solid #ced4da;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    background-color: #ffffff;
+    transition: all 0.3s ease;
+    background-color: white;
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     border-color: #007bff;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .form-group input:disabled {
-    background-color: #f0f0f0;
+    background-color: #f8f9fa;
     cursor: not-allowed;
 }
 
-button[type="submit"] {
-    width: 100%;
-    max-width: 400px;
-    padding: 12px;
-    background-color: #007bff;
-    color: #ffffff;
+.btn {
+    padding: 0.8rem 1.2rem;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    margin-top: 20px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-button[type="submit"]:hover {
-    background-color: #0056b3;
-    transform: scale(1.02);
+.btn-primary {
+    background-color: #007bff;
+    color: white;
 }
 
-button[type="submit"]:active {
-    transform: scale(0.98);
+.btn-primary:hover {
+    background-color: #0069d9;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 .btn-secondary {
     background-color: #6c757d;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 15px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    color: white;
 }
 
 .btn-secondary:hover {
     background-color: #5a6268;
-    transform: scale(1.02);
+    transform: translateY(-1px);
 }
 
 .btn-secondary:active {
-    transform: scale(0.98);
+    transform: translateY(0);
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+}
+
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.location-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fetched-location {
+    background-color: #28a745 !important;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #6c757d;
 }
 
 /* Responsive Design */
-@media (max-width: 600px) {
-    h2 {
-        font-size: 24px;
+@media (max-width: 576px) {
+    .card {
+        padding: 1.5rem;
     }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-        font-size: 14px;
-        padding: 10px;
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
     }
 }

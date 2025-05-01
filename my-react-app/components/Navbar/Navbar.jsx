@@ -37,7 +37,7 @@ const Navbar = (props) => {
                                 <div div className="nav-link" onClick={() => { To_profile(props.UserID) }}>profile</div>
                             ) : (
                                 <>
-                                    <Link className="nav-link" to='/login' >
+                                    <Link className="nav-link" to='/register' >
                                         بحث عن عمل 
                                     </Link>
                                 </>

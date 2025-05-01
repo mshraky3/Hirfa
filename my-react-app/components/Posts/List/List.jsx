@@ -51,9 +51,6 @@ const List = () => {
                                 <strong>{worker.account_name}</strong>
                             </div>
 
-                            <div className="card-content">
-                                {worker.location}
-                            </div>
 
                             <div className="card-content">
                                 {worker.description || "No description available"}

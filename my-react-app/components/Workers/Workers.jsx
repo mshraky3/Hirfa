@@ -71,7 +71,7 @@ const Workers = () => {
             setWorkers([]);
         }
     }, [selectedType, userLocation]);
-
+    
     const fetchWorkers = async (pageNum) => {
         try {
             setLoading(prev => ({ ...prev, workers: true }));
