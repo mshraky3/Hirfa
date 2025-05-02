@@ -13,7 +13,6 @@ const bufferToBase64 = (bufferArray) => {
 const parseCoordinates = (locationString) => {
   if (!locationString) return null;
   
-  // Handle Google Maps URL format
   const urlMatch = locationString.match(/q=([\d.-]+),([\d.-]+)/);
   if (urlMatch) {
     return {
@@ -124,8 +123,7 @@ function Profile() {
     }
   }, [data, currentUserCoords]);
 
-  const isOwnProfile = !location.state?.ThisUserID || 
-                       location.state.ThisUserID === location.state?.UserID;
+  const isOwnProfile = location.state?.ThisUserID === location.state?.UserID;
 
   // Parse the location for display
   const displayLocation = data?.location ? 
