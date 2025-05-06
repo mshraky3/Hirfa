@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 app.use(fileUpload());
 app.use(bodyParser.urlencoded({ extended: !0 }));
-cors({ origin: "*", methods: ["GET", "POST"], allowedHeaders: ["Content-Type", "Authorization"] })
+cors({ origin: "*", methods: ["GET", "POST"], allowedHeaders: ["*"] })
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -23,7 +23,15 @@ const upload = multer({
     storage: storage
 });
 
-const db = new pg.Client({ password: process.env.password, host: process.env.host, database: process.env.db, user: process.env.user, port: 5432 })
+const db = new pg.Client({
+    password: process.env.password, host: process.env.host, database: process.env.db, user: process.env.user, port: 5432,
+    ssl: {
+        rejectUnauthorized: false
+    },
+    max: 20,               
+    idleTimeoutMillis: 30000, 
+    connectionTimeoutMillis: 5000
+})
 db.connect()
 
 
@@ -49,6 +57,7 @@ app.post("/api/login", async (req, res) => {
 
 
 app.post("/api/register", async (req, res) => {
+    console.log(req.body);
     try {
         const {
             name,
@@ -264,7 +273,7 @@ app.get("/api/Workers/types", async (req, res) => {
 
 app.post("/api/Workers/filter", async (req, res) => {
     const { userLat, userLng, workerType, page = 1 } = req.body;
-    if (typeof userLat !== 'number' || typeof userLng !== 'number' || 
+    if (typeof userLat !== 'number' || typeof userLng !== 'number' ||
         isNaN(userLat) || isNaN(userLng) || !workerType || typeof workerType !== 'string') {
         return res.status(400).json({ error: 'Invalid request parameters' });
     }
@@ -308,7 +317,7 @@ app.post("/api/Workers/filter", async (req, res) => {
         const values = [userLat, userLng, workerType, limit, offset];
         const result = await db.query(query, values);
 
-        res.json({ 
+        res.json({
             workers: result.rows,
             page,
             hasMore: result.rows.length === limit
