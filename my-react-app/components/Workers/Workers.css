@@ -70,14 +70,17 @@
 
 .worker-image {
     height: 150px;
-    background-color: #f0f0f0;
+    
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .worker-image img {
+    min-width: 100px;
+    min-height: 100px;
     max-width: 100%;
+    aspect-ratio: 1/1;
     max-height: 100%;
     object-fit: contain;
 }
@@ -88,6 +91,10 @@
 
 .worker-info {
     padding: 15px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
 }
 
 .worker-info h3 {
@@ -255,4 +262,49 @@
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
     cursor: pointer;
+}
+.type-selector {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.type-selector label {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.type-selector .custom-select {
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 2px solid #1976d2;
+    min-width: 280px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.type-selector .custom-select:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 5px rgba(21, 101, 192, 0.5);
+    outline: none;
+}
+
+.type-selector .custom-select option {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.select-type-prompt {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #555;
+    margin-top: 20px;
 }

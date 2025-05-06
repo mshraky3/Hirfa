@@ -4,6 +4,10 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import "./Login.css";
 
+// Make sure you've installed leaflet and added the CSS:
+// npm install leaflet react-leaflet
+// import 'leaflet/dist/leaflet.css'; // Add this in App.js or index.js
+
 const Register = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -13,8 +17,8 @@ const Register = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoadingLocation, setIsLoadingLocation] = useState(false);
     const [isLocationFetched, setIsLocationFetched] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
     const [coordinates, setCoordinates] = useState(null); // Holds lat/lng
-    const [locationRetryCount, setLocationRetryCount] = useState(0);
 
     const jobOptions = [
         { ar: "مقاول" },
@@ -71,8 +75,7 @@ const Register = () => {
         if (name === "logo_image" && files && files[0]) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                const preview = reader.result;
-                setPreviewImage(preview);
+                setPreviewImage(reader.result);
             };
             reader.readAsDataURL(files[0]);
             setFormData((prev) => ({
@@ -89,64 +92,29 @@ const Register = () => {
 
     const getLocation = () => {
         setIsLoadingLocation(true);
-        setError("");
-
-        if (!navigator.geolocation) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                    setFormData((prev) => ({
+                        ...prev,
+                        location: googleMapsLink
+                    }));
+                    setCoordinates({ lat: latitude, lng: longitude });
+                    setIsLoadingLocation(false);
+                    setIsLocationFetched(true);
+                    setError("");
+                },
+                (err) => {
+                    setError("فشل في الحصول على موقعك. يرجى المحاولة مرة أخرى.");
+                    setIsLoadingLocation(false);
+                }
+            );
+        } else {
             setError("الموقع غير مدعوم من متصفحك.");
             setIsLoadingLocation(false);
-            return;
         }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude, accuracy } = position.coords;
-
-                // Reject inaccurate results (in meters)
-                if (accuracy > 30) {
-                    setError("الموقع غير دقيق بدرجة كافية، يُرجى المحاولة مرة أخرى في مكان مفتوح.");
-                    setIsLoadingLocation(false);
-                    setLocationRetryCount(prev => prev + 1);
-                    return;
-                }
-
-                const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                setFormData((prev) => ({
-                    ...prev,
-                    location: googleMapsLink
-                }));
-                setCoordinates({ lat: latitude, lng: longitude });
-                setIsLoadingLocation(false);
-                setIsLocationFetched(true);
-                setLocationRetryCount(0);
-            },
-            (err) => {
-                console.error("Error getting location:", err);
-                let errorMessage = "";
-
-                switch (err.code) {
-                    case err.PERMISSION_DENIED:
-                        errorMessage = "يرجى تمكين الموقع لمواصلة التسجيل.";
-                        break;
-                    case err.POSITION_UNAVAILABLE:
-                        errorMessage = "بيانات الموقع غير متوفرة. يُرجى المحاولة لاحقًا.";
-                        break;
-                    case err.TIMEOUT:
-                        errorMessage = "انتهاء وقت جلب الموقع. هل تريد إعادة المحاولة؟";
-                        break;
-                    default:
-                        errorMessage = "فشل في الحصول على موقعك. يُرجى المحاولة مرة أخرى.";
-                }
-
-                setError(errorMessage);
-                setIsLoadingLocation(false);
-                setLocationRetryCount(prev => prev + 1);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-        );
     };
 
     const validateStep = () => {
@@ -244,6 +212,7 @@ const Register = () => {
         });
 
         const host = process.env.REACT_APP_HOST;
+
         try {
             const response = await axios.post(host + "/register", formDataToSend);
             if (response.status === 200) {
@@ -362,8 +331,6 @@ const Register = () => {
                     <div className="form-group">
                         <label htmlFor="location">موقع الشركة</label>
                         <p className="progress-text">اضغط الزر لجلب الموقع.</p>
-
-                        {/* Location Button */}
                         <div className="location-btn">
                             <button
                                 type="button"
@@ -381,31 +348,7 @@ const Register = () => {
                             </button>
                         </div>
 
-                        {/* Loading Message */}
-                        {isLoadingLocation && (
-                            <p style={{ color: "#888", marginTop: "10px" }}>
-                                تحديد الموقع بدقة عالية... قد يستغرق ذلك بضع ثوانٍ.
-                            </p>
-                        )}
-
-                        {/* Error Message */}
-                        {error && (
-                            <p className="error-message">{error}</p>
-                        )}
-
-                        {/* Retry Button */}
-                        {(locationRetryCount > 0 && !isLoadingLocation && !isLocationFetched) && (
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={getLocation}
-                                style={{ marginTop: "10px" }}
-                            >
-                                إعادة المحاولة
-                            </button>
-                        )}
-
-                        {/* Map Preview */}
+                        {/* Show interactive draggable map only after location is fetched */}
                         {isLocationFetched && coordinates && (
                             <>
                                 <div style={{ height: '250px', width: '100%', marginTop: '15px' }}>
@@ -425,9 +368,13 @@ const Register = () => {
                                             eventHandlers={{
                                                 dragend(e) {
                                                     const { lat, lng } = e.target.getLatLng();
-                                                    setCoordinates({ lat, lng });
+                                                    const newPos = { lat, lng };
+                                                    setCoordinates(newPos);
                                                     const link = `https://www.google.com/maps?q=${lat},${lng}`;
-                                                    setFormData(prev => ({ ...prev, location: link }));
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        location: link
+                                                    }));
                                                 }
                                             }}
                                         >
@@ -448,6 +395,8 @@ const Register = () => {
                                 </a>
                             </>
                         )}
+
+                        {error && <p className="error-message">{error}</p>}
                     </div>
                 );
             case "description":
@@ -520,14 +469,18 @@ const Register = () => {
         <div className="register-container">
             <div className="login-header">
                 <h2>إنشاء حساب</h2>
-                <Link to="/login" className="login-btn">تسجيل دخول</Link>
+                <Link to="/login" className="login-btn">
+                    تسجيل دخول
+                </Link>
             </div>
             <div className="card">
                 <div className="step-indicator">
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className={`step ${currentStep === index ? "active" : ""} ${currentStep > index ? "completed" : ""}`}
+                            className={`step ${currentStep === index ? "active" : ""} ${
+                                currentStep > index ? "completed" : ""
+                            }`}
                         >
                             {index + 1}
                         </div>

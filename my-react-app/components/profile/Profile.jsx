@@ -50,7 +50,6 @@ function Profile() {
     const [distance, setDistance] = useState(null);
     const [locationStatus, setLocationStatus] = useState('idle');
     const [locationError, setLocationError] = useState('');
-    const [retryCount, setRetryCount] = useState(0);
     const [isHighAccuracyFetching, setIsHighAccuracyFetching] = useState(false);
 
     const isOwnProfile = location.state?.ThisUserID === location.state?.UserID;
@@ -63,7 +62,6 @@ function Profile() {
                 });
                 setData(response.data);
             } catch (error) {
-                console.error('Error fetching profile data:', error);
                 navigate('/404');
             }
         }
@@ -172,7 +170,6 @@ function Profile() {
         if (isOwnProfile) {
             return <a href={data.location} target="_blank" rel="noopener noreferrer">عرض في خرائط جوجل</a>;
         }
-
         if (locationStatus === 'loading') {
             return (
                 <>
@@ -187,7 +184,6 @@ function Profile() {
                 </>
             );
         }
-
         if (distance !== null) {
             return (
                 <>
@@ -200,7 +196,6 @@ function Profile() {
                 </>
             );
         }
-
         if (locationStatus === 'error') {
             return (
                 <>
@@ -217,16 +212,15 @@ function Profile() {
                 </>
             );
         }
-
-        return parseCoordinates(data?.location)
-            ? `${parseCoordinates(data?.location).lat.toFixed(5)}, ${parseCoordinates(data?.location).lon.toFixed(5)}`
+        const coords = parseCoordinates(data?.location);
+        return coords
+            ? `${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)}`
             : 'الموقع غير معروف';
     };
 
     return (
         <div className="profile-container">
             <h2 className="profile-title">{isOwnProfile ? 'ملفي الشخصي' : 'ملف المستخدم'}</h2>
-
             {data ? (
                 <div className="profile-card">
                     <div className="profile-header">
@@ -251,7 +245,6 @@ function Profile() {
                             <p className="profile-title">{data.account_type || 'عضو'}</p>
                         </div>
                     </div>
-
                     <div className="profile-details">
                         <div className="detail-section">
                             <h3 className="section-title">حول</h3>
