@@ -1,0 +1,571 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import "./Login.css";
+
+const Register = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const [message, setMessage] = useState(null);
+    const [error, setError] = useState("");
+    const [currentStep, setCurrentStep] = useState(0);
+    const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+    const [isLocationFetched, setIsLocationFetched] = useState(false);
+    const [coordinates, setCoordinates] = useState(null); // Holds lat/lng
+    const [locationRetryCount, setLocationRetryCount] = useState(0);
+
+    const jobOptions = [
+        { ar: "مقاول" },
+        { ar: "فني بلاط" },
+        { ar: "فني دهان" },
+        { ar: "فني أرضيات" },
+        { ar: "سباك" },
+        { ar: "كهربائي" },
+        { ar: "فني تكييف" },
+        { ar: "فني أنظمة أمن" },
+        { ar: "عمال نقل" },
+        { ar: "نجار" },
+        { ar: "عامل نظافة" },
+        { ar: "بستاني" },
+        { ar: "أخرى" }
+    ];
+
+    const [formData, setFormData] = useState({
+        working_in: "",
+        name: "",
+        username: "",
+        password: "",
+        confirm_password: "",
+        location: "",
+        phone_number: "",
+        description: "",
+        logo_image: null,
+    });
+
+    const steps = [
+        { title: "مجال العمل", key: "working_in" },
+        { title: "الاسم الاول", key: "name" },
+        { title: "ايميل حساب المستخدم", key: "username" },
+        { title: "كلمة المرور", key: "password" },
+        { title: "تأكيد كلمة المرور", key: "confirm_password" },
+        { title: "رقم الهاتف", key: "phone_number" },
+        { title: "الموقع", key: "location" },
+        { title: "الوصف", key: "description" },
+        { title: "صورة شخصية", key: "logo_image" },
+    ];
+
+    useEffect(() => {
+        if (location.state?.message) {
+            setMessage(location.state.message);
+            const timer = setTimeout(() => {
+                setMessage(null);
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [location]);
+
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === "logo_image" && files && files[0]) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const preview = reader.result;
+                setPreviewImage(preview);
+            };
+            reader.readAsDataURL(files[0]);
+            setFormData((prev) => ({
+                ...prev,
+                [name]: files[0],
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: files ? files[0] : value,
+            }));
+        }
+    };
+
+    const getLocation = () => {
+        setIsLoadingLocation(true);
+        setError("");
+
+        if (!navigator.geolocation) {
+            setError("الموقع غير مدعوم من متصفحك.");
+            setIsLoadingLocation(false);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude, accuracy } = position.coords;
+
+                // Reject inaccurate results (in meters)
+                if (accuracy > 30) {
+                    setError("الموقع غير دقيق بدرجة كافية، يُرجى المحاولة مرة أخرى في مكان مفتوح.");
+                    setIsLoadingLocation(false);
+                    setLocationRetryCount(prev => prev + 1);
+                    return;
+                }
+
+                const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                setFormData((prev) => ({
+                    ...prev,
+                    location: googleMapsLink
+                }));
+                setCoordinates({ lat: latitude, lng: longitude });
+                setIsLoadingLocation(false);
+                setIsLocationFetched(true);
+                setLocationRetryCount(0);
+            },
+            (err) => {
+                console.error("Error getting location:", err);
+                let errorMessage = "";
+
+                switch (err.code) {
+                    case err.PERMISSION_DENIED:
+                        errorMessage = "يرجى تمكين الموقع لمواصلة التسجيل.";
+                        break;
+                    case err.POSITION_UNAVAILABLE:
+                        errorMessage = "بيانات الموقع غير متوفرة. يُرجى المحاولة لاحقًا.";
+                        break;
+                    case err.TIMEOUT:
+                        errorMessage = "انتهاء وقت جلب الموقع. هل تريد إعادة المحاولة؟";
+                        break;
+                    default:
+                        errorMessage = "فشل في الحصول على موقعك. يُرجى المحاولة مرة أخرى.";
+                }
+
+                setError(errorMessage);
+                setIsLoadingLocation(false);
+                setLocationRetryCount(prev => prev + 1);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    };
+
+    const validateStep = () => {
+        const currentKey = steps[currentStep].key;
+        switch (currentKey) {
+            case "working_in":
+                if (!formData.working_in.trim()) {
+                    setError("يرجى اختيار مجال العمل");
+                    return false;
+                }
+                break;
+            case "name":
+                if (!formData.name.trim()) {
+                    setError("يرجى إدخال اسم الحساب");
+                    return false;
+                }
+                break;
+            case "username":
+                if (!formData.username.trim()) {
+                    setError("يرجى إدخال اسم المستخدم");
+                    return false;
+                }
+                break;
+            case "password":
+                if (!formData.password) {
+                    setError("يرجى إدخال كلمة المرور");
+                    return false;
+                }
+                break;
+            case "confirm_password":
+                if (formData.password !== formData.confirm_password) {
+                    setError("كلمتا المرور غير متطابقتين");
+                    return false;
+                }
+                break;
+            case "location":
+                if (!formData.location.trim()) {
+                    setError("يرجى جلب موقعك");
+                    return false;
+                }
+                break;
+            case "phone_number":
+                if (!formData.phone_number.trim()) {
+                    setError("يرجى إدخال رقم الهاتف");
+                    return false;
+                }
+                break;
+            case "description":
+                if (!formData.description.trim()) {
+                    setError("يرجى إدخال وصف الحساب");
+                    return false;
+                }
+                break;
+            case "logo_image":
+                if (!formData.logo_image) {
+                    setError("يرجى تحميل صورة الشعار");
+                    return false;
+                }
+                break;
+            default:
+                return true;
+        }
+        setError("");
+        return true;
+    };
+
+    const nextStep = () => {
+        if (validateStep()) {
+            if (currentStep < steps.length - 1) {
+                setCurrentStep((prev) => prev + 1);
+            }
+        }
+    };
+
+    const prevStep = () => {
+        if (currentStep > 0) {
+            setCurrentStep((prev) => prev - 1);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        for (let i = 0; i < steps.length; i++) {
+            setCurrentStep(i);
+            if (!validateStep()) {
+                return;
+            }
+        }
+
+        const formDataToSend = new FormData();
+        Object.keys(formData).forEach((key) => {
+            if (formData[key]) {
+                formDataToSend.append(key, formData[key]);
+            }
+        });
+
+        const host = process.env.REACT_APP_HOST;
+        try {
+            const response = await axios.post(host + "/register", formDataToSend);
+            if (response.status === 200) {
+                navigate("/login", { state: { message: response.data.message } });
+            }
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "حدث خطأ أثناء التسجيل"
+            );
+        }
+    };
+
+    const renderCurrentStep = () => {
+        const currentKey = steps[currentStep].key;
+        switch (currentKey) {
+            case "working_in":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="working_in">اختر مجال العمل</label>
+                        <select
+                            className="form-control"
+                            name="working_in"
+                            value={formData.working_in}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">-- اختر خيارًا --</option>
+                            {jobOptions.map((job, i) => (
+                                <option key={i} value={job.ar}>
+                                    {job.ar}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                );
+            case "name":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="name">اسم الحساب</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="name"
+                            placeholder="ادخل الاسم"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                );
+            case "username":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="username">اسم المستخدم</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="username"
+                            placeholder="ادخل اسم المستخدم"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                );
+            case "password":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="password">كلمة المرور</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            name="password"
+                            id="password"
+                            placeholder="ادخل كلمة المرور"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                );
+            case "confirm_password":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="confirm_password">تأكيد كلمة المرور</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            name="confirm_password"
+                            id="confirm_password"
+                            placeholder="أكد كلمة المرور"
+                            value={formData.confirm_password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                );
+            case "phone_number":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="phone_number">رقم الهاتف</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="phone_number"
+                            placeholder="ادخل رقم الهاتف"
+                            value={formData.phone_number}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                );
+            case "location":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="location">موقع الشركة</label>
+                        <p className="progress-text">اضغط الزر لجلب الموقع.</p>
+
+                        {/* Location Button */}
+                        <div className="location-btn">
+                            <button
+                                type="button"
+                                className={`btn btn-secondary ${isLocationFetched ? "fetched-location" : ""}`}
+                                onClick={getLocation}
+                                disabled={isLoadingLocation}
+                            >
+                                {isLoadingLocation ? (
+                                    "جار التحميل..."
+                                ) : isLocationFetched ? (
+                                    "✓ تم جلب الموقع"
+                                ) : (
+                                    "جلب الموقع"
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Loading Message */}
+                        {isLoadingLocation && (
+                            <p style={{ color: "#888", marginTop: "10px" }}>
+                                تحديد الموقع بدقة عالية... قد يستغرق ذلك بضع ثوانٍ.
+                            </p>
+                        )}
+
+                        {/* Error Message */}
+                        {error && (
+                            <p className="error-message">{error}</p>
+                        )}
+
+                        {/* Retry Button */}
+                        {(locationRetryCount > 0 && !isLoadingLocation && !isLocationFetched) && (
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={getLocation}
+                                style={{ marginTop: "10px" }}
+                            >
+                                إعادة المحاولة
+                            </button>
+                        )}
+
+                        {/* Map Preview */}
+                        {isLocationFetched && coordinates && (
+                            <>
+                                <div style={{ height: '250px', width: '100%', marginTop: '15px' }}>
+                                    <MapContainer
+                                        center={coordinates}
+                                        zoom={13}
+                                        scrollWheelZoom={false}
+                                        style={{ height: '100%', width: '100%' }}
+                                    >
+                                        <TileLayer
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                            attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                                        />
+                                        <Marker
+                                            position={coordinates}
+                                            draggable={true}
+                                            eventHandlers={{
+                                                dragend(e) {
+                                                    const { lat, lng } = e.target.getLatLng();
+                                                    setCoordinates({ lat, lng });
+                                                    const link = `https://www.google.com/maps?q=${lat},${lng}`;
+                                                    setFormData(prev => ({ ...prev, location: link }));
+                                                }
+                                            }}
+                                        >
+                                            <Popup>يمكنك سحب العلامة لتغيير الموقع</Popup>
+                                        </Marker>
+                                    </MapContainer>
+                                </div>
+                                <p style={{ marginTop: '10px', textAlign: 'center' }}>
+                                    المواقع الحالية: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
+                                </p>
+                                <a
+                                    href={formData.location}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ display: 'block', marginTop: '8px' }}
+                                >
+                                    افتح الموقع الكامل في خرائط جوجل
+                                </a>
+                            </>
+                        )}
+                    </div>
+                );
+            case "description":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="description">وصف الحساب</label>
+                        <textarea
+                            className="form-control"
+                            name="description"
+                            rows="3"
+                            placeholder="ادخل وصف الحساب"
+                            value={formData.description}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                );
+            case "logo_image":
+                return (
+                    <div className="form-group">
+                        <label htmlFor="logo_image">شعار الحساب</label>
+                        <div className="image-upload-container">
+                            {previewImage ? (
+                                <div className="image-preview">
+                                    <img
+                                        src={previewImage}
+                                        alt="معاينة الشعار"
+                                        className="logo-preview"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary change-image-btn"
+                                        onClick={() => document.getElementById('logo_image').click()}
+                                    >
+                                        تغيير الصورة
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="upload-area">
+                                    <label htmlFor="logo_image" className="upload-label">
+                                        <div className="upload-icon">+</div>
+                                        <div className="upload-text">
+                                            انقر لتحميل الصورة
+                                        </div>
+                                    </label>
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                id="logo_image"
+                                className="form-control-file"
+                                name="logo_image"
+                                accept=".jpg,.jpeg,.png,.gif"
+                                onChange={handleChange}
+                                style={{ display: 'none' }}
+                                required
+                            />
+                        </div>
+                        <p className="file-requirements">
+                            يرجى تحميل صورة بحجم أقل من 2MB
+                        </p>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className="register-container">
+            <div className="login-header">
+                <h2>إنشاء حساب</h2>
+                <Link to="/login" className="login-btn">تسجيل دخول</Link>
+            </div>
+            <div className="card">
+                <div className="step-indicator">
+                    {steps.map((step, index) => (
+                        <div
+                            key={index}
+                            className={`step ${currentStep === index ? "active" : ""} ${currentStep > index ? "completed" : ""}`}
+                        >
+                            {index + 1}
+                        </div>
+                    ))}
+                </div>
+                <h2>الخطوة {currentStep + 1}: {steps[currentStep].title}</h2>
+                {message && (
+                    <div className="message">
+                        <p>{message}</p>
+                    </div>
+                )}
+                {error && (
+                    <div className="error-message">
+                        <p>{error}</p>
+                    </div>
+                )}
+                <form onSubmit={handleSubmit}>
+                    {renderCurrentStep()}
+                    <div className="form-navigation">
+                        {currentStep > 0 && (
+                            <button type="button" onClick={prevStep} className="btn btn-secondary">
+                                السابق
+                            </button>
+                        )}
+                        {currentStep < steps.length - 1 ? (
+                            <button type="button" onClick={nextStep} className="btn btn-primary">
+                                التالي
+                            </button>
+                        ) : (
+                            <button type="submit" className="btn btn-success">
+                                تسجيل
+                            </button>
+                        )}
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default Register;
