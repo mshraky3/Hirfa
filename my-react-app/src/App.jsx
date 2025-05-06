@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom'; // Import useLocation
 import List from '../components/Posts/List/List';
 import Footer from '../components/Footer/Footer';
 import About from '../components/About/About';
+import 'leaflet/dist/leaflet.css';
 function App() {
     const location = useLocation();
     const data = location.state
