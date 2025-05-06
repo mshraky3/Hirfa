@@ -1,0 +1,65 @@
+/* About.css */
+
+.about-wrapper {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 80px 24px 60px 24px;
+    text-align: center;
+    direction: rtl;
+    font-family: 'Tajawal', 'Arial', sans-serif;
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.about-wrapper h1 {
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+    color: #1c2833;
+    font-weight: 800;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.about-wrapper p {
+    font-size: 1.125rem;
+    margin-bottom: 24px;
+    color: #444;
+    line-height: 1.9;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-wrapper {
+        padding: 60px 20px 40px 20px;
+    }
+
+    .about-wrapper h1 {
+        font-size: 2rem;
+    }
+
+    .about-wrapper p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-wrapper h1 {
+        font-size: 1.75rem;
+    }
+
+    .about-wrapper p {
+        font-size: 0.95rem;
+    }
+}

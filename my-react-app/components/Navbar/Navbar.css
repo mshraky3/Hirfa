@@ -1,58 +1,50 @@
-/* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-   
-}
 
-/* Navbar Container */
-nav {
-    color: white; /* Light text color */
+nav.navbar {
+    color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    
+    background: transparent;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding-left: 0%;
+    z-index: 10;
 }
 
-/* Nav List */
 .nav-list {
     display: flex;
     justify-content: space-between;
     list-style: none;
     width: 100%;
+    padding: 0;
+    margin: 0;
 }
 
-/* Logo Container */
 .logo-cont {
     display: flex;
     align-items: center;
 }
 
-/* Logo */
 .logo {
     font-size: 1.2rem;
     font-weight: bold;
-    
+    display: flex;
+    align-items: center;
 }
 
 .logo .dash-text {
     text-decoration: none;
     color: #fafafa;
-}
-
-/* DASH Text */
-.dash-text {
-    margin-left: 1rem;
     font-size: 1.5rem;
     font-weight: bold;
+    margin-left: 0.5rem;
 }
 
-/* Links Container */
 .links-cont {
     display: flex;
-    justify-content: flex-end; /* Align links to the right */
+    justify-content: flex-end;
 }
 
 .links-cot {
@@ -60,15 +52,16 @@ nav {
     align-items: center;
 }
 
-/* Individual Links */
 .nav-link {
-    margin: 0 0.5rem; /* Spacing between links */
+    margin: 0 0.75rem;
     font-size: 1rem;
     text-decoration: none;
-    color: white; /* Light text color */
-    transition: color 0.3s ease;
+    color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
 
-    &:hover {
-        color: #ecf0f1; /* Slightly lighter hover color */
-    }
+.nav-link:hover {
+    color: #f0f0f0;
+    transform: translateY(-1px);
 }
