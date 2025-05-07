@@ -34,6 +34,14 @@ nav.navbar {
     align-items: center;
 }
 
+.logo img {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    max-width: 10%;
+    align-items: center;
+}
+
 .logo .dash-text {
     text-decoration: none;
     color: #fafafa;
@@ -64,4 +72,25 @@ nav.navbar {
 .nav-link:hover {
     color: #f0f0f0;
     transform: translateY(-1px);
+}
+
+
+@media (max-width: 576px) {
+
+    .navbar {
+        max-width: 100vw;
+        overflow: hidden;
+    }
+    .logo-cont{
+        flex: 1;
+    }
+    .nav-list{
+        display: flex;
+        justify-content: space-around;
+
+    }
+    .logo{
+        min-width: 30%;
+    }
+
 }

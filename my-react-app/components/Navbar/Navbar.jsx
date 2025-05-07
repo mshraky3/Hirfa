@@ -2,7 +2,7 @@ import React from 'react';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
+import logo from "./H.png"
 const Navbar = (props) => {
     const navigate = useNavigate();
     function To_profile(id) {
@@ -14,7 +14,7 @@ const Navbar = (props) => {
             <ul className='nav-list'>
                 <li className='logo-cont'>
                     <div className='logo'>
-                        <Link className="dash-text"> </Link>
+                        <img src={logo} className='logo' alt="" />
                         <Link className="dash-text">حِرَفة </Link>
                     </div>
                 </li>

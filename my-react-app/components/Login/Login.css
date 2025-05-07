@@ -232,7 +232,6 @@ h2 {
     color: #6c757d;
 }
 
-/* Responsive Design */
 @media (max-width: 576px) {
     .card {
         padding: 1.5rem;

@@ -24,7 +24,9 @@ function App() {
     }, [location.state]); 
 
     return (
+        
         <div className="app-container">
+          
             {stats?.message && (
                 <div className="message">
                     <p>{stats.message}</p>
