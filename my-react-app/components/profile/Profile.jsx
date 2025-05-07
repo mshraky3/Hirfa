@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './Profile.css';
+import './profile.css';
 import axios from 'axios';
 import Default from './default-user.jpg';
 

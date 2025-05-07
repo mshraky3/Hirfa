@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from '../components/Header/Header';
-import { useLocation } from 'react-router-dom'; // Import useLocation
+import { useLocation } from 'react-router-dom'; 
 import List from '../components/Posts/List/List';
 import Footer from '../components/Footer/Footer';
 import About from '../components/About/About';
