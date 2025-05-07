@@ -7,8 +7,8 @@ import Login from '../components/Login/Login.jsx';
 import Register from '../components/Login/register.jsx';
 import Profile from '../components/profile/profile.jsx';
 import Workers from '../components/Workers/Workers.jsx';
-import { SpeedInsights } from "@vercel/speed-insights/react"
-import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 
 
 
