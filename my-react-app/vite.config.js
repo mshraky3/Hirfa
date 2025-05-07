@@ -4,7 +4,6 @@ import path from 'path';
 import { loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
-  // Load environment variables from .env file
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
