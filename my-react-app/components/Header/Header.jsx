@@ -14,10 +14,10 @@ const Header = (props) => {
             <Navbar UserID={props.UserID} isUser={props.isUser ? props.isUser : false} ThisUserID={props.ThisUserID} />
             <div className="header-content animate-fade-in">
                 <h1 className="header-title">
-                    ابحث عن عمال بسرعة وأينما كنت
+                    محتاج عامل ؟
                 </h1>
                 <p className="header-description">
-                    تواصل فورًا مع العمال المهرة بالقرب منك<br /> بدون تعقيدات و بسهولة.
+                    تواصل فورًا مع عامل بالقرب منك<br /> بدون تعقيدات و بسهولة.
                 </p>
                 <div className='header-buttons'>
                     <button className="header-button" onClick={goTO}>
