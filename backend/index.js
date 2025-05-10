@@ -184,7 +184,9 @@ app.get("/api/Workers/types", async (req, res) => {
 
 app.post("/api/Workers/filter", async (req, res) => {
     const { userLat, userLng, workerType, page = 1 } = req.body;
-    if (typeof userLat !== "number" || typeof userLng !== "number" || isNaN(userLat) || isNaN(userLng) || !workerType || typeof workerType !== "string") {
+    
+    if (typeof userLat !== "number" || typeof userLng !== "number" || 
+        isNaN(userLat) || isNaN(userLng) || !workerType) {
         return res.status(400).json({ error: "Invalid request parameters" });
     }
 
@@ -192,18 +194,19 @@ app.post("/api/Workers/filter", async (req, res) => {
     const offset = (page - 1) * limit;
 
     try {
-        const query = `
-            WITH locations AS (
-                SELECT 
-                    id, name, phone_number, working_in, logo_image,
-                    (regexp_match(location, 'q=([+-]?\\d+(?:\\.\\d+)?),([+-]?\\d+(?:\\.\\d+)?)'))[1]::FLOAT AS lat,
-                    (regexp_match(location, 'q=([+-]?\\d+(?:\\.\\d+)?),([+-]?\\d+(?:\\.\\d+)?)'))[2]::FLOAT AS lng
-                FROM account
-                WHERE working_in = $3
-                  AND location ~* 'q=([+-]?\\d+(?:\\.\\d+)?),([+-]?\\d+(?:\\.\\d+)?)'
-            )
+        await db.query(`
+            UPDATE account 
+            SET 
+                lat = CAST(SPLIT_PART(SPLIT_PART(location, 'q=', 2), ',', 1) AS FLOAT),
+                lng = CAST(SPLIT_PART(SPLIT_PART(location, 'q=', 2), ',', 2) AS FLOAT)
+            WHERE location LIKE '%q=%' 
+            AND (lat IS NULL OR lng IS NULL)
+        `);
+
+        const result = await db.query(`
             SELECT 
-                id, name, phone_number, working_in, encode(logo_image, 'base64') AS logo_image,
+                id, name, phone_number, working_in, 
+                encode(logo_image, 'base64') AS logo_image,
                 ROUND(
                     6371 * 2 * ASIN(SQRT(
                         POWER(SIN(($1 - lat) * PI()/180 / 2), 2) +
@@ -211,16 +214,25 @@ app.post("/api/Workers/filter", async (req, res) => {
                         POWER(SIN(($2 - lng) * PI()/180 / 2), 2)
                     ))::numeric, 2
                 ) AS distance
-            FROM locations
-            WHERE lat IS NOT NULL AND lng IS NOT NULL
+            FROM account
+            WHERE working_in ILIKE $3
+              AND lat IS NOT NULL
+              AND lng IS NOT NULL
             ORDER BY distance ASC
-            LIMIT $4 OFFSET $5;
-        `;
-        const values = [userLat, userLng, workerType, limit, offset];
-        const result = await db.query(query, values);
-        res.json({ workers: result.rows, page, hasMore: result.rows.length === limit });
+            LIMIT $4 OFFSET $5
+        `, [userLat, userLng, workerType, limit, offset]);
+        
+        res.json({ 
+            workers: result.rows, 
+            page, 
+            hasMore: result.rows.length === limit 
+        });
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch workers" });
+        console.error("Filter error:", err);
+        res.status(500).json({ 
+            error: "Failed to fetch workers",
+            details: err.message 
+        });
     }
 });
 
