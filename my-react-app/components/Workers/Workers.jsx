@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './Workers.css';
 
@@ -16,6 +16,7 @@ const Workers = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
 
+    const cancelTokenRef = useRef(null);
     const host = process.env.REACT_APP_HOST;
 
     useEffect(() => {
@@ -62,28 +63,53 @@ const Workers = () => {
         } else {
             setWorkers([]);
         }
+
+        return () => {
+            if (cancelTokenRef.current) {
+                cancelTokenRef.current();
+            }
+        };
     }, [selectedType, userLocation]);
 
     const fetchWorkers = async (pageNum) => {
+        if (cancelTokenRef.current) {
+            cancelTokenRef.current();
+        }
+
         try {
             setLoading(prev => ({ ...prev, workers: true }));
             setError(null);
-            const response = await axios.post(`${host}/Workers/filter`, {
-                userLat: userLocation.lat,
-                userLng: userLocation.lng,
-                workerType: selectedType,
-                page: pageNum
-            });
+
+            const CancelToken = axios.CancelToken;
+            const source = CancelToken.source();
+            cancelTokenRef.current = () => source.cancel('Request canceled');
+
+            const response = await axios.post(
+                `${host}/Workers/filter`,
+                {
+                    userLat: userLocation.lat,
+                    userLng: userLocation.lng,
+                    workerType: selectedType,
+                    page: pageNum
+                },
+                { cancelToken: source.token }
+            );
+
             const newWorkers = response.data.workers || [];
             if (pageNum === 1) {
                 setWorkers(newWorkers);
             } else {
                 setWorkers(prev => [...prev, ...newWorkers]);
             }
+
             setHasMore(response.data.hasMore || false);
             setPage(pageNum);
-        } catch {
-            setError("فشل تحميل العمال");
+        } catch (err) {
+            if (axios.isCancel(err)) {
+                console.log('Request canceled', err.message);
+            } else {
+                setError("فشل تحميل العمال");
+            }
         } finally {
             setLoading(prev => ({ ...prev, workers: false }));
         }
@@ -98,7 +124,30 @@ const Workers = () => {
     };
 
     const isLoading = loading.location || loading.types;
-
+    const WorkerCard = React.memo(({ worker }) => (
+        <div key={worker.id} className="worker-card">
+            <div className="worker-image">
+                {worker.logo_image ? (
+                    <img
+                        src={`data:image/webp;base64,${worker.logo_image}`}
+                        alt={worker.name}
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ) : (
+                    <div className="no-image">بدون صورة</div>
+                )}
+            </div>
+            <div className="worker-info">
+                <h3>{worker.name}</h3>
+                <p className="worker-field">{worker.working_in}</p>
+                <p className="worker-phone">{worker.phone_number}</p>
+                <p className="worker-distance">
+                    {Math.round(worker.distance)} كم
+                </p>
+            </div>
+        </div>
+    ));
     return (
         <div className="workers-container">
             <h1>ابحث عن عمال بالقرب منك</h1>
@@ -133,26 +182,7 @@ const Workers = () => {
                             ) : workers.length > 0 ? (
                                 <div className="workers-list">
                                     {workers.map(worker => (
-                                        <div key={worker.id} className="worker-card">
-                                            <div className="worker-image">
-                                                {worker.logo_image ? (
-                                                    <img 
-                                                        src={`data:image/png;base64,${worker.logo_image}`} 
-                                                        alt={worker.name}
-                                                    />
-                                                ) : (
-                                                    <div className="no-image">بدون صورة</div>
-                                                )}
-                                            </div>
-                                            <div className="worker-info">
-                                                <h3>{worker.name}</h3>
-                                                <p className="worker-field">{worker.working_in}</p>
-                                                <p className="worker-phone">{worker.phone_number}</p>
-                                                <p className="worker-distance">
-                                                    {worker.distance} كم
-                                                </p>
-                                            </div>
-                                        </div>
+                                        <WorkerCard key={worker.id} worker={worker} />
                                     ))}
                                 </div>
                             ) : (
@@ -161,7 +191,7 @@ const Workers = () => {
                                 </div>
                             )}
                             {hasMore && (
-                                <button 
+                                <button
                                     className="load-more"
                                     onClick={handleLoadMore}
                                     disabled={loading.workers}

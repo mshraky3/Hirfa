@@ -187,7 +187,7 @@ function Profile() {
         if (distance !== null) {
             return (
                 <>
-                    <div>{`${Math.round(distance * 10) / 10} كم من موقعك`}</div>
+                    <div>{`${Math.round((Math.round(distance * 10) / 10))} كم من موقعك`}</div>
                     {isHighAccuracyFetching && (
                         <small style={{ display: "block", color: "#888", fontSize: "0.8rem", marginTop: "4px" }}>
                             جارٍ تحسين دقة الموقع...

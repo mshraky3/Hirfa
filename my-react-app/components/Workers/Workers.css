@@ -1,3 +1,4 @@
+
 .workers-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -155,6 +156,9 @@
     opacity: 0.4;
     animation: loadingDots 1.4s infinite ease-in-out both;
 }
+
+
+
 
 .loading-dots span:nth-child(1) {
     animation-delay: -0.32s;
