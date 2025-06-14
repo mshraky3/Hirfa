@@ -229,7 +229,7 @@ function Profile() {
                                 className="profile-avatar"
                                 style={{
                                     backgroundImage: data.logo_image
-                                        ? `url(data:image/webp;base64,${bufferToBase64(data.logo_image)})`
+                                        ? `url(data:image/webp;base64,${data.logo_image})`
                                         : `url(${Default})`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center'

@@ -10,33 +10,6 @@ function App() {
     const location = useLocation();
     const data = location.state;
     const [stats, setStats] = useState(null);
-    const [userLocation, setUserLocation] = useState(null);
-    const [locationLoading, setLocationLoading] = useState(true);
-    const [locationError, setLocationError] = useState(null);
-
-    useEffect(() => {
-        const getLocation = () => {
-            if (!navigator.geolocation) {
-                setLocationError("الموقع غير مدعوم من المتصفح");
-                setLocationLoading(false);
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setUserLocation({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                    setLocationLoading(false);
-                },
-                () => {
-                    setLocationError("تعذر الحصول على الموقع");
-                    setLocationLoading(false);
-                }
-            );
-        };
-        getLocation();
-    }, []);
 
     useEffect(() => {
         if (location.state?.message) {
@@ -50,10 +23,6 @@ function App() {
         }
     }, [location.state]); 
 
-    if (locationLoading) {
-        return <div>جارٍ تحديد موقعك...</div>;
-    }
-
     return (
         <div className="app-container">
             {stats?.message && (
@@ -64,8 +33,8 @@ function App() {
             <Header isUser={data?.isUser} UserID={data?.UserID} ThisUserID={data?.ThisUserID} Type={data?.Type} />
             <List  
                 ThisUserID={data?.ThisUserID} 
-                userLocation={userLocation} 
-                locationError={locationError}
+                userLocation={null} // You might need to adjust this depending on how List uses it
+                locationError={null}
             />
             <About />
             <Footer />
