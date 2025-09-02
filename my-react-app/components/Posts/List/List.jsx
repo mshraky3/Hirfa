@@ -25,6 +25,9 @@ const List = () => {
       try {
         const host = import.meta.env.VITE_REACT_APP_HOST;
                 const response = await axios.get(host + "/Workers");
+                console.log();
+                console.log(host +'/Workers');
+                
         if (response.status === 200 && Array.isArray(response.data?.data)) {
           setWorkers(response.data.data);
         } else {
