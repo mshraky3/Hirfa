@@ -242,3 +242,26 @@
         transform: scale(1);
     }
 }
+
+@media (max-width: 768px) {
+    .workers-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .worker-card {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .workers-container {
+        padding: 10px;
+    }
+
+    .type-selector select,
+    .type-selector .custom-select {
+        min-width: 100%;
+    }
+}

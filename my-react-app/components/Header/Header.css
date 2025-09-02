@@ -1,3 +1,4 @@
+/* Only using classes and IDs — no general selectors */
 
 html[dir="rtl"] .header-content {
     font-family: 'Tajawal', 'Arial', sans-serif;
@@ -5,10 +6,12 @@ html[dir="rtl"] .header-content {
 
 .header {
     position: relative;
+    padding-top: 18%;
     background-image: url('./b2269b44-75d8-452f-8d09-022469a34466.webp');
     background-size: cover;
     background-position: center;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     isolation: isolate;
     overflow: hidden;
 }
@@ -31,8 +34,10 @@ html[dir="rtl"] .header-content {
     color: white;
     padding: 20px;
     position: relative;
-    margin-top: 5vh;
     animation: fadeInUp 1s ease forwards;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 @keyframes fadeInUp {
@@ -53,6 +58,8 @@ html[dir="rtl"] .header-content {
     line-height: 1.2;
     margin-bottom: 1.5rem;
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .header-description {
@@ -62,6 +69,8 @@ html[dir="rtl"] .header-content {
     max-width: 800px;
     font-weight: 300;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .header-buttons {
@@ -69,6 +78,7 @@ html[dir="rtl"] .header-content {
     justify-content: center;
     margin-top: 1.5rem;
     gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .header-button {
@@ -82,10 +92,119 @@ html[dir="rtl"] .header-content {
     padding: 1rem 2.5rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    min-width: 120px;
+    flex: 1;
+    max-width: 200px;
 }
 
 .header-button:hover {
     background-color: #2f2f2f;
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .header {
+        padding-top: 50%;
+    }
+    .header-title {
+        font-size: 2.5rem;
+    }
+
+    .header-description {
+        font-size: 1.25rem;
+    }
+
+    .header-buttons {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .header-button {
+        font-size: 1.2rem;
+        padding: 0.8rem 2rem;
+        min-width: auto;
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content {
+        padding: 15px;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+
+    .header-description {
+        font-size: 1rem;
+    }
+
+    .header-button {
+        font-size: 1rem;
+        padding: 0.7rem 1.5rem;
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 320px) {
+    .header-title {
+        font-size: 1.8rem;
+    }
+
+    .header-description {
+        font-size: 0.9rem;
+    }
+
+    .header-button {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* Mobile Landscape Fix - Ensures buttons are visible */
+@media (max-height: 500px) and (max-width: 900px) and (orientation: landscape) {
+    .header {
+        padding-top: 20%;
+        min-height: 100vh;
+        height: auto;
+        overflow: visible;
+    }
+
+    .header-content {
+        padding: 10px 16px;
+        gap: 0.8rem;
+    }
+
+    .header-title {
+        font-size: 2.4rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .header-description {
+        font-size: 1.3rem;
+        margin-bottom: 1.2rem;
+        max-width: 700px;
+    }
+
+    .header-buttons {
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .header-button {
+        font-size: 1.2rem;
+        padding: 0.7rem 1.6rem;
+        min-width: 120px;
+        max-width: 180px;
+        width: auto;
+    }
 }

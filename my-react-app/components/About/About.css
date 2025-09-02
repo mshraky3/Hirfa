@@ -55,6 +55,10 @@
 }
 
 @media (max-width: 480px) {
+    .about-wrapper {
+        padding: 40px 15px 30px 15px;
+    }
+
     .about-wrapper h1 {
         font-size: 1.75rem;
     }

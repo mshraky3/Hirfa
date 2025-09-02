@@ -49,16 +49,16 @@ const Register = () => {
     });
 
     const steps = [
-        { title: "مجال العمل", key: "working_in" },
-        { title: "الاسم الاول", key: "name" },
-        { title: "ايميل حساب المستخدم", key: "username" },
-        { title: "كلمة المرور", key: "password" },
-        { title: "تأكيد كلمة المرور", key: "confirm_password" },
-        { title: "رقم الهاتف", key: "phone_number" },
+        { title: "معلومات الحساب", key: "account" },
+        { title: "العمل والتواصل", key: "job_contact" },
         { title: "الموقع", key: "location" },
-        { title: "الوصف", key: "description" },
-        { title: "صورة شخصية", key: "logo_image" },
+        { title: "تفاصيل إضافية", key: "details" },
     ];
+
+    // Smoothly scroll to top on step change (helps on mobile)
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [currentStep]);
 
     useEffect(() => {
         if (location.state?.message) {
@@ -69,6 +69,14 @@ const Register = () => {
             return () => clearTimeout(timer);
         }
     }, [location]);
+
+    // Auto-fetch location when entering the location step
+    useEffect(() => {
+        const key = steps[currentStep].key;
+        if (key === "location" && !isLocationFetched && !isLoadingLocation && !formData.location) {
+            getLocation();
+        }
+    }, [currentStep]);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -120,60 +128,54 @@ const Register = () => {
     const validateStep = () => {
         const currentKey = steps[currentStep].key;
         switch (currentKey) {
-            case "working_in":
-                if (!formData.working_in.trim()) {
-                    setError("يرجى اختيار مجال العمل");
-                    return false;
-                }
-                break;
-            case "name":
+            case "account": {
                 if (!formData.name.trim()) {
                     setError("يرجى إدخال اسم الحساب");
                     return false;
                 }
-                break;
-            case "username":
                 if (!formData.username.trim()) {
                     setError("يرجى إدخال اسم المستخدم");
                     return false;
                 }
-                break;
-            case "password":
                 if (!formData.password) {
                     setError("يرجى إدخال كلمة المرور");
                     return false;
                 }
-                break;
-            case "confirm_password":
                 if (formData.password !== formData.confirm_password) {
                     setError("كلمتا المرور غير متطابقتين");
                     return false;
                 }
                 break;
-            case "location":
-                if (!formData.location.trim()) {
-                    setError("يرجى جلب موقعك");
+            }
+            case "job_contact": {
+                if (!formData.working_in.trim()) {
+                    setError("يرجى اختيار مجال العمل");
                     return false;
                 }
-                break;
-            case "phone_number":
                 if (!formData.phone_number.trim()) {
                     setError("يرجى إدخال رقم الهاتف");
                     return false;
                 }
                 break;
-            case "description":
+            }
+            case "location": {
+                if (!formData.location.trim()) {
+                    setError("يرجى جلب موقعك");
+                    return false;
+                }
+                break;
+            }
+            case "details": {
                 if (!formData.description.trim()) {
                     setError("يرجى إدخال وصف الحساب");
                     return false;
                 }
-                break;
-            case "logo_image":
                 if (!formData.logo_image) {
                     setError("يرجى تحميل صورة الشعار");
                     return false;
                 }
                 break;
+            }
             default:
                 return true;
         }
@@ -211,10 +213,11 @@ const Register = () => {
             }
         });
 
-        const host = process.env.REACT_APP_HOST;
+        // Vite uses import.meta.env for env variables
+        const host = import.meta.env.VITE_HOST;
 
         try {
-            const response = await axios.post(host + "/register", formDataToSend);
+            const response = await axios.post((host || "") + "/register", formDataToSend);
             if (response.status === 200) {
                 navigate("/login", { state: { message: response.data.message } });
             }
@@ -229,101 +232,93 @@ const Register = () => {
     const renderCurrentStep = () => {
         const currentKey = steps[currentStep].key;
         switch (currentKey) {
-            case "working_in":
+            case "account":
                 return (
-                    <div className="form-group">
-                        <label htmlFor="working_in">اختر مجال العمل</label>
-                        <select
-                            className="form-control"
-                            name="working_in"
-                            value={formData.working_in}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">-- اختر خيارًا --</option>
-                            {jobOptions.map((job, i) => (
-                                <option key={i} value={job.ar}>
-                                    {job.ar}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="form-grid form-grid--2">
+                        <div className="form-group">
+                            <label htmlFor="name">اسم الحساب</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="name"
+                                placeholder="ادخل الاسم"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="username">اسم المستخدم</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="username"
+                                placeholder="ادخل اسم المستخدم"
+                                value={formData.username}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="password">كلمة المرور</label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                name="password"
+                                id="password"
+                                placeholder="ادخل كلمة المرور"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="confirm_password">تأكيد كلمة المرور</label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                name="confirm_password"
+                                id="confirm_password"
+                                placeholder="أكد كلمة المرور"
+                                value={formData.confirm_password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
                     </div>
                 );
-            case "name":
+            case "job_contact":
                 return (
-                    <div className="form-group">
-                        <label htmlFor="name">اسم الحساب</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="name"
-                            placeholder="ادخل الاسم"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                );
-            case "username":
-                return (
-                    <div className="form-group">
-                        <label htmlFor="username">اسم المستخدم</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="username"
-                            placeholder="ادخل اسم المستخدم"
-                            value={formData.username}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                );
-            case "password":
-                return (
-                    <div className="form-group">
-                        <label htmlFor="password">كلمة المرور</label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            name="password"
-                            id="password"
-                            placeholder="ادخل كلمة المرور"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                );
-            case "confirm_password":
-                return (
-                    <div className="form-group">
-                        <label htmlFor="confirm_password">تأكيد كلمة المرور</label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            name="confirm_password"
-                            id="confirm_password"
-                            placeholder="أكد كلمة المرور"
-                            value={formData.confirm_password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                );
-            case "phone_number":
-                return (
-                    <div className="form-group">
-                        <label htmlFor="phone_number">رقم الهاتف</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="phone_number"
-                            placeholder="ادخل رقم الهاتف"
-                            value={formData.phone_number}
-                            onChange={handleChange}
-                            required
-                        />
+                    <div className="form-grid form-grid--2">
+                        <div className="form-group">
+                            <label htmlFor="working_in">اختر مجال العمل</label>
+                            <select
+                                className="form-control"
+                                name="working_in"
+                                value={formData.working_in}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">-- اختر خيارًا --</option>
+                                {jobOptions.map((job, i) => (
+                                    <option key={i} value={job.ar}>
+                                        {job.ar}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="phone_number">رقم الهاتف</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="phone_number"
+                                placeholder="ادخل رقم الهاتف"
+                                value={formData.phone_number}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
                     </div>
                 );
             case "location":
@@ -351,7 +346,7 @@ const Register = () => {
                         {/* Show interactive draggable map only after location is fetched */}
                         {isLocationFetched && coordinates && (
                             <>
-                                <div style={{ height: '250px', width: '100%', marginTop: '15px' }}>
+                                <div className="map-container">
                                     <MapContainer
                                         center={coordinates}
                                         zoom={13}
@@ -382,14 +377,14 @@ const Register = () => {
                                         </Marker>
                                     </MapContainer>
                                 </div>
-                                <p style={{ marginTop: '10px', textAlign: 'center' }}>
+                                <p className="coords-text">
                                     المواقع الحالية: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
                                 </p>
                                 <a
                                     href={formData.location}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    style={{ display: 'block', marginTop: '8px' }}
+                                    className="maps-link"
                                 >
                                     افتح الموقع الكامل في خرائط جوجل
                                 </a>
@@ -399,65 +394,64 @@ const Register = () => {
                         {error && <p className="error-message">{error}</p>}
                     </div>
                 );
-            case "description":
+            case "details":
                 return (
-                    <div className="form-group">
-                        <label htmlFor="description">وصف الحساب</label>
-                        <textarea
-                            className="form-control"
-                            name="description"
-                            rows="3"
-                            placeholder="ادخل وصف الحساب"
-                            value={formData.description}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                );
-            case "logo_image":
-                return (
-                    <div className="form-group">
-                        <label htmlFor="logo_image">شعار الحساب</label>
-                        <div className="image-upload-container">
-                            {previewImage ? (
-                                <div className="image-preview">
-                                    <img
-                                        src={previewImage}
-                                        alt="معاينة الشعار"
-                                        className="logo-preview"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary change-image-btn"
-                                        onClick={() => document.getElementById('logo_image').click()}
-                                    >
-                                        تغيير الصورة
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="upload-area">
-                                    <label htmlFor="logo_image" className="upload-label">
-                                        <div className="upload-icon">+</div>
-                                        <div className="upload-text">
-                                            انقر لتحميل الصورة
-                                        </div>
-                                    </label>
-                                </div>
-                            )}
-                            <input
-                                type="file"
-                                id="logo_image"
-                                className="form-control-file"
-                                name="logo_image"
-                                accept=".jpg,.jpeg,.png,.gif"
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label htmlFor="description">وصف الحساب</label>
+                            <textarea
+                                className="form-control"
+                                name="description"
+                                rows="3"
+                                placeholder="ادخل وصف الحساب"
+                                value={formData.description}
                                 onChange={handleChange}
-                                style={{ display: 'none' }}
                                 required
                             />
                         </div>
-                        <p className="file-requirements">
-                            يرجى تحميل صورة بحجم أقل من 2MB
-                        </p>
+                        <div className="form-group">
+                            <label htmlFor="logo_image">شعار الحساب</label>
+                            <div className="image-upload-container">
+                                {previewImage ? (
+                                    <div className="image-preview">
+                                        <img
+                                            src={previewImage}
+                                            alt="معاينة الشعار"
+                                            className="logo-preview"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary change-image-btn"
+                                            onClick={() => document.getElementById('logo_image').click()}
+                                        >
+                                            تغيير الصورة
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="upload-area">
+                                        <label htmlFor="logo_image" className="upload-label">
+                                            <div className="upload-icon">+</div>
+                                            <div className="upload-text">
+                                                انقر لتحميل الصورة
+                                            </div>
+                                        </label>
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    id="logo_image"
+                                    className="form-control-file"
+                                    name="logo_image"
+                                    accept=".jpg,.jpeg,.png,.gif"
+                                    onChange={handleChange}
+                                    style={{ display: 'none' }}
+                                    required
+                                />
+                            </div>
+                            <p className="file-requirements">
+                                يرجى تحميل صورة بحجم أقل من 2MB
+                            </p>
+                        </div>
                     </div>
                 );
             default:
@@ -465,8 +459,10 @@ const Register = () => {
         }
     };
 
+    const progressPercent = Math.round((currentStep / (steps.length - 1)) * 100);
+
     return (
-        <div className="register-container">
+        <div className="register-container" dir="rtl">
             <div className="login-header">
                 <h2>إنشاء حساب</h2>
                 <Link to="/login" className="login-btn">
@@ -485,6 +481,9 @@ const Register = () => {
                             {index + 1}
                         </div>
                     ))}
+                </div>
+                <div className="progress-bar" aria-label="progress">
+                    <div className="progress-bar__inner" style={{ width: `${progressPercent}%` }} />
                 </div>
                 <h2>الخطوة {currentStep + 1}: {steps[currentStep].title}</h2>
                 {message && (

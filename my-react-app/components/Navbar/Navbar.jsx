@@ -1,24 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import logo from "./H.png"
+
 const Navbar = (props) => {
     const navigate = useNavigate();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     function To_profile(id) {
         navigate('/profile', { state: { UserID: id, ThisUserID: props.ThisUserID } })
     }
 
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
     return (
         <nav className="navbar">
-            <ul className='nav-list'>
-                <li className='logo-cont'>
+            <div className="nav-container">
+                <div className='logo-cont'>
                     <div className='logo'>
-                        <img src={logo} className='logo' alt="" />
+                        <img src={logo} className='logo-img' alt="" />
                         <Link className="dash-text">حِرَفة </Link>
                     </div>
-                </li>
-                <li className='links-cont'>
+                </div>
+                <div className={`links-cont ${isMobileMenuOpen ? 'active' : ''}`}>
                     <div className='links-cot'>
                         <Link className="nav-link" to='/workers'>
                             قائمة الحرفيين
@@ -31,8 +38,13 @@ const Navbar = (props) => {
                             </Link>
                         )}
                     </div>
-                </li>
-            </ul>
+                </div>
+                <div className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                    <div className="line"></div>
+                    <div className="line"></div>
+                    <div className="line"></div>
+                </div>
+            </div>
         </nav>
     );
 };

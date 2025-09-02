@@ -1,12 +1,65 @@
-.footer{
+.footer {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 60px;
-    background: linear-gradient(145deg, rgba(232, 239, 227, 0.9) 0%, rgba(178, 196, 165, 0.85) 100%),
-    radial-gradient(circle at bottom right, #f8fbf7 0%, #d5e3d1 30%, #b5c6b0 100%);
-
-    
-    radial-gradient(circle at bottom right, #f8fbf7 0%, #d5e3d1 30%, #b5c6b0 100%);
+    background: 
+        linear-gradient(145deg, rgba(232, 239, 227, 0.9) 0%, rgba(178, 196, 165, 0.85) 100%),
+        radial-gradient(circle at bottom right, #f8fbf7 0%, #d5e3d1 30%, #b5c6b0 100%);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.footer-content {
+    text-align: center;
+    font-size: 1rem;
+    color: #2d372d;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.footer-content p {
+    margin: 0;
+}
+
+/* Responsive: Tablet */
+@media (max-width: 768px) {
+    .footer {
+        height: 50px;
+    }
+
+    .footer-content {
+        font-size: 0.95rem;
+    }
+}
+
+/* Responsive: Small Mobile */
+@media (max-width: 480px) {
+    .footer {
+        height: 45px;
+        padding: 0 12px;
+    }
+
+    .footer-content {
+        font-size: 0.85rem;
+    }
+
+    .footer-content p {
+        line-height: 1.3;
+    }
+}
+
+/* Responsive: Mobile Landscape (narrow height) */
+@media (max-height: 500px) and (max-width: 900px) and (orientation: landscape) {
+    .footer {
+        height: 40px;
+    }
+
+    .footer-content {
+        font-size: 0.8rem;
+    }
 }

@@ -27,3 +27,9 @@ body {
     margin: 0;
     font-size: 16px;
 }
+
+@media (max-width: 480px) {
+    .message p {
+        font-size: 14px;
+    }
+}
