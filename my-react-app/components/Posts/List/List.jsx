@@ -24,10 +24,7 @@ const List = () => {
     const fetchData = async () => {
       try {
         const host = 'https://hirfaapi.vercel.app/api';
-                const response = await axios.get(host + "/Workers");
-                console.log();
-                console.log(host +'/Workers');
-                
+        const response = await axios.get(host + "/Workers");
         if (response.status === 200 && Array.isArray(response.data?.data)) {
           setWorkers(response.data.data);
         } else {

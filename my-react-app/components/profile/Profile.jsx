@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './profile.css';
 import axios from 'axios';
 import Default from './default-user.jpg';
+import HOST from '../../src/config/host';
 
 const bufferToBase64 = (bufferArray) => {
     if (!bufferArray || !bufferArray.data || !Array.isArray(bufferArray.data)) return null;
@@ -41,7 +42,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 function Profile() {
-    const host = process.env.REACT_APP_HOST;
+    const host = HOST;
     const location = useLocation();
     const navigate = useNavigate();
 

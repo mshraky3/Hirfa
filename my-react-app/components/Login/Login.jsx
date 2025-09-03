@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import HOST from '../../src/config/host';
 
 
 
@@ -12,7 +13,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const host = process.env.REACT_APP_HOST;
+        const host = HOST;
         try {
             const login = await axios.post(host + '/login', {
                 email,

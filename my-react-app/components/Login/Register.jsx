@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import HOST from "../../src/config/host";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import "./Login.css";
@@ -213,8 +214,7 @@ const Register = () => {
             }
         });
 
-        // Vite uses import.meta.env for env variables
-        const host = import.meta.env.VITE_HOST;
+        const host = HOST;
 
         try {
             const response = await axios.post((host || "") + "/register", formDataToSend);
