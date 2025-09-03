@@ -23,7 +23,7 @@ const List = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const host = import.meta.env.VITE_REACT_APP_HOST;
+        const host = 'https://hirfaapi.vercel.app/api';
                 const response = await axios.get(host + "/Workers");
                 console.log();
                 console.log(host +'/Workers');
