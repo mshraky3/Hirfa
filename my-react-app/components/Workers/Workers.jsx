@@ -18,7 +18,7 @@ const Workers = () => {
     const [hasMore, setHasMore] = useState(false);
 
     const cancelTokenRef = useRef(null);
-    const host = process.env.REACT_APP_HOST;
+    const host = 'https://hirfaapi.vercel.app/api';
 
     useEffect(() => {
         const getLocation = () => {
@@ -211,5 +211,6 @@ const Workers = () => {
         </div>
     );
 };
+
 
 export default Workers;
